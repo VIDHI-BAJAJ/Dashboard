@@ -13,6 +13,8 @@ import {
 
 const THEME_KEY = "crm-theme";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export default function DarkCRMDashboard() {
   const [theme, setTheme] = useState(() => localStorage.getItem(THEME_KEY) || "dark");
   const [data, setData] = useState({
@@ -57,10 +59,10 @@ export default function DarkCRMDashboard() {
       setError("");
 
       const [leadsRes, convRes, tasksRes, dealsRes] = await Promise.all([
-        fetch("/api/leads"),
-        fetch("/api/conversations"),
-        fetch("/api/tasks"),
-        fetch("/api/deals"),
+        fetch(`${API_URL}/api/leads`),
+        fetch(`${API_URL}/api/conversations`),
+        fetch(`${API_URL}/api/tasks`),
+        fetch(`${API_URL}/api/deals`),
       ]);
 
       const bad = [leadsRes, convRes, tasksRes, dealsRes].find((r) => !r.ok);
