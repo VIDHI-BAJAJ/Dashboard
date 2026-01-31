@@ -10,10 +10,6 @@ export default function Navbar({ updatedAgoLabel, loading, refreshing, fetchAll 
             <div className="grid h-10 w-10 place-items-center rounded-3xl bg-white/15 backdrop-blur-[24px] border border-white/20 shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.5)]">
               <IconBolt />
             </div>
-            <div className="leading-tight hidden sm:block">
-              <div className="text-sm font-semibold text-gray-100">FinCRM</div>
-              <div className="text-xs text-gray-400/90">Dashboard</div>
-            </div>
           </div>
           <nav className="hidden lg:flex items-center gap-1">
             <NavItem active>Dashboard</NavItem>
@@ -29,7 +25,6 @@ export default function Navbar({ updatedAgoLabel, loading, refreshing, fetchAll 
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/12 backdrop-blur-[24px] px-3 py-1.5 text-xs text-gray-300/95 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
               <span className="h-2 w-2 rounded-full bg-green-500/90 shadow-[0_0_8px_rgba(34,197,94,0.6)]" />
               <span className="hidden md:inline">Live · </span>
-              <span className="truncate max-w-[120px] sm:max-w-none">{updatedAgoLabel}</span>
             </span>
             <button
               type="button"
