@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { IconUsers, IconRefresh } from "./UIComponents";
 
-export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRange, setTimeRange, percent, isLightMode = false }) {
+export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRange, setTimeRange, percent, isLightMode = false, selectedLeadId, onLeadSelect }) {
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const leadsPerPage = 10;
+
   // Filter leads data
   const leadsRows = useMemo(() => {
     return (data.leads || []).map((rec) => {
@@ -17,6 +21,33 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
       };
     });
   }, [data.leads]);
+
+  // Get current leads for the page
+  const indexOfLastLead = currentPage * leadsPerPage;
+  const indexOfFirstLead = indexOfLastLead - leadsPerPage;
+  const currentLeads = leadsRows.slice(indexOfFirstLead, indexOfLastLead);
+  
+  // Calculate total pages
+  const totalPages = Math.ceil(leadsRows.length / leadsPerPage);
+
+  // Change page
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Previous page
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Next page
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
 
   // Group by status
   const leadsByStatus = useMemo(() => {
@@ -116,8 +147,8 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
         <div className={`p-5 border-b ${isLightMode ? 'border-gray-200/40' : 'border-white/10'}`}>
           <h2 className={`text-lg font-semibold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>All Leads</h2>
         </div>
-        <div>
-          <table className="w-full">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-full">
             <thead>
               <tr className={`border-b ${isLightMode ? 'border-gray-200' : 'border-white/10'}`}>
                 <th className={`px-5 py-3 text-left text-xs font-medium uppercase tracking-wider ${isLightMode ? 'text-black' : 'text-gray-400'}`}>Name</th>
@@ -128,8 +159,12 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
               </tr>
             </thead>
             <tbody className={isLightMode ? 'divide-y divide-gray-200' : 'divide-y divide-white/10'}>
-              {leadsRows.slice(0, 10).map((lead) => (
-                <tr key={lead.id} className={`transition-colors ${isLightMode ? 'hover:bg-gray-50' : 'hover:bg-white/5'}`}>
+              {currentLeads.map((lead) => (
+                <tr 
+                  key={lead.id} 
+                  className={`transition-colors cursor-pointer ${isLightMode ? 'hover:bg-gray-50' : 'hover:bg-white/5'}`}
+                  onClick={() => onLeadSelect && onLeadSelect(lead.id)}
+                >
                   <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{lead.fullName || "Unknown"}</td>
                   <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'}`}>{lead.phone || "-"}</td>
                   <td className="px-5 py-4">
@@ -158,6 +193,157 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
         {leadsRows.length === 0 && (
           <div className={`p-10 text-center ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
             No leads found
+          </div>
+        )}
+        {/* Pagination */}
+        {leadsRows.length > 0 && (
+          <div className={`p-4 border-t ${isLightMode ? 'border-gray-200' : 'border-white/10'}`}>
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
+              <div className={`text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'} text-center sm:text-left`}>
+                Showing <span className="font-medium">{indexOfFirstLead + 1}</span> to{' '}
+                <span className="font-medium">
+                  {Math.min(indexOfLastLead, leadsRows.length)}
+                </span>{' '}
+                of <span className="font-medium">{leadsRows.length}</span> leads
+              </div>
+              <div className="flex items-center flex-wrap justify-center sm:justify-end gap-1 sm:gap-2">
+                <button
+                  onClick={goToPreviousPage}
+                  disabled={currentPage === 1}
+                  className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                    currentPage === 1
+                      ? 'cursor-not-allowed opacity-50 '
+                      : isLightMode
+                        ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                  }`}
+                >
+                  <span className="sm:hidden">&lt;</span>
+                  <span className="hidden sm:inline">Previous</span>
+                </button>
+                        
+                {/* Page numbers */}
+                {totalPages <= 7 ? (
+                  // Show all pages if total pages is 7 or less
+                  [...Array(totalPages)].map((_, index) => {
+                    const pageNumber = index + 1;
+                    return (
+                      <button
+                        key={index}
+                        onClick={() => paginate(pageNumber)}
+                        className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                          currentPage === pageNumber
+                            ? isLightMode
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-blue-500 text-white'
+                            : isLightMode
+                              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                              : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                        }`}
+                      >
+                        {pageNumber}
+                      </button>
+                    );
+                  })
+                ) : (
+                  // Show abbreviated version for more pages
+                  <>
+                    {/* First page */}
+                    <button
+                      onClick={() => paginate(1)}
+                      className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                        currentPage === 1
+                          ? isLightMode
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-blue-500 text-white'
+                          : isLightMode
+                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                      }`}
+                    >
+                      1
+                    </button>
+                            
+                    {/* Ellipsis after first page */}
+                    {currentPage > 3 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>...</span>}
+                            
+                    {/* Pages around current page */}
+                    {currentPage > 2 && currentPage < totalPages && (
+                      <button
+                        onClick={() => paginate(currentPage - 1)}
+                        className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                          isLightMode
+                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                        }`}
+                      >
+                        {currentPage - 1}
+                      </button>
+                    )}
+                            
+                    {/* Current page */}
+                    <button
+                      onClick={() => paginate(currentPage)}
+                      className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                        isLightMode
+                          ? 'bg-blue-500 text-white'
+                          : 'bg-blue-500 text-white'
+                      }`}
+                    >
+                      {currentPage}
+                    </button>
+                            
+                    {/* Pages around current page */}
+                    {currentPage < totalPages - 1 && (
+                      <button
+                        onClick={() => paginate(currentPage + 1)}
+                        className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                          isLightMode
+                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                        }`}
+                      >
+                        {currentPage + 1}
+                      </button>
+                    )}
+                            
+                    {/* Ellipsis before last page */}
+                    {currentPage < totalPages - 2 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>...</span>}
+                            
+                    {/* Last page */}
+                    <button
+                      onClick={() => paginate(totalPages)}
+                      className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                        currentPage === totalPages
+                          ? isLightMode
+                            ? 'bg-blue-500 text-white'
+                            : 'bg-blue-500 text-white'
+                          : isLightMode
+                            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                      }`}
+                    >
+                      {totalPages}
+                    </button>
+                  </>
+                )}
+                        
+                <button
+                  onClick={goToNextPage}
+                  disabled={currentPage === totalPages || totalPages === 0}
+                  className={`px-2 sm:px-3 py-1 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
+                    currentPage === totalPages || totalPages === 0
+                      ? 'cursor-not-allowed opacity-50 '
+                      : isLightMode
+                        ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        : 'bg-white/10 text-gray-300 hover:bg-white/20'
+                  }`}
+                >
+                  <span className="sm:hidden">&gt;</span>
+                  <span className="hidden sm:inline">Next</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>

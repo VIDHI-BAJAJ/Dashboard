@@ -7,6 +7,7 @@ import LeadsPage from "./LeadsPage";
 import ConversationsPage from "./ConversationsPage";
 import TasksPage from "./TasksPage";
 import DealsPage from "./DealsPage";
+import LeadDetails from "./LeadDetails";
 import { GlassTooltip } from "./UIComponents";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -22,6 +23,7 @@ export default function Dashboard() {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
   const [activePage, setActivePage] = useState("dashboard");
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [isLightMode, setIsLightMode] = useState(false);
 
   const inFlightRef = useRef(false);
@@ -140,6 +142,11 @@ export default function Dashboard() {
       };
     });
   }, [data.leads]);
+
+  const selectedLead = useMemo(() => {
+    if (!selectedLeadId) return null;
+    return data.leads.find(lead => lead.id === selectedLeadId);
+  }, [data.leads, selectedLeadId]);
 
   const convRows = useMemo(() => {
     return data.conversations.map((rec) => {
@@ -310,16 +317,29 @@ export default function Dashboard() {
               />
             </>
           ) : activePage === "leads" ? (
-            <LeadsPage 
-              data={data}
-              loading={loading}
-              refreshing={refreshing}
-              fetchAll={fetchAll}
-              timeRange={timeRange}
-              setTimeRange={setTimeRange}
-              percent={percent}
-              isLightMode={isLightMode}
-            />
+            selectedLead ? (
+              <LeadDetails
+                lead={selectedLead}
+                onBack={() => setSelectedLeadId(null)}
+                loading={loading}
+                refreshing={refreshing}
+                fetchAll={fetchAll}
+                isLightMode={isLightMode}
+              />
+            ) : (
+              <LeadsPage 
+                data={data}
+                loading={loading}
+                refreshing={refreshing}
+                fetchAll={fetchAll}
+                timeRange={timeRange}
+                setTimeRange={setTimeRange}
+                percent={percent}
+                isLightMode={isLightMode}
+                selectedLeadId={selectedLeadId}
+                onLeadSelect={setSelectedLeadId}
+              />
+            )
           ) : activePage === "conversations" ? (
             <ConversationsPage 
               data={data}
