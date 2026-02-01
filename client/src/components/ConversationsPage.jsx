@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { IconChat, IconRefresh } from "./UIComponents";
 import ConversationDetails from "./ConversationDetails";
 
-export default function ConversationsPage({ data, loading, refreshing, fetchAll, timeAgo, isLightMode = false }) {
+export default function ConversationsPage({ data, loading, refreshing, fetchAll, timeAgo, isLightMode = false, initialSelectedContact = null, onContactSelect }) {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const conversationsPerPage = 8;
@@ -87,7 +87,7 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
   };
 
   // State for selected contact
-  const [selectedContact, setSelectedContact] = useState(null);
+  const [selectedContact, setSelectedContact] = useState(initialSelectedContact);
 
   return (
     <div className="space-y-6">

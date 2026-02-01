@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [error, setError] = useState("");
   const [activePage, setActivePage] = useState("dashboard");
   const [selectedLeadId, setSelectedLeadId] = useState(null);
+  const [selectedContact, setSelectedContact] = useState(null);
   const [isLightMode, setIsLightMode] = useState(false);
   const [isLeadFormOpen, setIsLeadFormOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -240,6 +241,8 @@ export default function Dashboard() {
         channel: safeString(f["Channel"] ?? f["Source"] ?? f["Lead Source"]),
         lastMessageAt: safeDate(f["Last Message At"] ?? f.lastMessageAt ?? f.last_message_at ?? rec?.createdTime),
         snippet: safeString(f["Last Message"] ?? f["Message"] ?? f["Snippet"]),
+        direction: safeString(f["Direction"]), // Inbound = we sent message (right side), Outbound = they replied (left side)
+        message: safeString(f["Body Text"] ?? f["Message"] ?? f["Last Message"] ?? f["Snippet"]),
       };
     });
   }, [data.conversations]);
@@ -420,7 +423,8 @@ export default function Dashboard() {
                 fmtDate={fmtDate}
                 isLightMode={isLightMode}
                 onConversationClick={(group) => {
-                  // Set active page to conversations and potentially pre-filter for the contact
+                  // Set selected contact and navigate to conversations page
+                  setSelectedContact(group);
                   setActivePage('conversations');
                 }}
               />
@@ -457,6 +461,8 @@ export default function Dashboard() {
               fetchAll={fetchAll}
               timeAgo={timeAgo}
               isLightMode={isLightMode}
+              initialSelectedContact={selectedContact}
+              onContactSelect={setSelectedContact}
             />
           ) : activePage === "tasks" ? (
             <TasksPage 
