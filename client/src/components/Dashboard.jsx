@@ -1,8 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import Navbar from "./Navbar";
+import Sidebar from "./Sidebar";
 import MetricsSection from "./MetricsSection";
 import LeadsSection from "./LeadsSection";
 import ActivitySection from "./ActivitySection";
+import LeadsPage from "./LeadsPage";
+import ConversationsPage from "./ConversationsPage";
+import TasksPage from "./TasksPage";
+import DealsPage from "./DealsPage";
 import { GlassTooltip } from "./UIComponents";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -17,6 +21,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState("");
+  const [activePage, setActivePage] = useState("dashboard");
+  const [isLightMode, setIsLightMode] = useState(false);
 
   const inFlightRef = useRef(false);
   const refreshIntervalRef = useRef(null);
@@ -246,49 +252,99 @@ export default function Dashboard() {
   }, [taskRows]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0b0f14] via-[#111827] to-[#0b0f14] text-gray-100">
-      {/* Soft ambient glow for glass effect */}
+    <div className={`min-h-screen transition-all duration-500 ${
+     isLightMode
+? "bg-gradient-to-br from-rose-200 via-purple-200 to-blue-200 text-gray-900"
+: "bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 text-gray-100"
+
+    }`}>
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute top-[10%] left-[5%] h-[50vh] w-[50vw] rounded-[50%] bg-blue-500/20 blur-[140px]" />
-        <div className="absolute top-[30%] right-[10%] h-[40vh] w-[40vw] rounded-[50%] bg-purple-500/20 blur-[120px]" />
-        <div className="absolute bottom-[20%] left-[20%] h-[35vh] w-[35vw] rounded-[50%] bg-emerald-400/15 blur-[100px]" />
+        <div className="absolute top-20 right-20 w-96 h-96 rounded-full bg-orange-400 opacity-40 blur-3xl animate-pulse" style={{ animationDuration: '4s' }} />
+        <div className="absolute bottom-20 left-20 w-80 h-80 rounded-full bg-pink-400 opacity-40 blur-3xl animate-pulse" style={{ animationDuration: '6s' }} />
+        <div className="absolute top-1/2 left-1/2 w-72 h-72 rounded-full bg-purple-400 opacity-40 blur-3xl animate-pulse" style={{ animationDuration: '5s' }} />
       </div>
 
-      <Navbar 
+      <Sidebar 
         updatedAgoLabel={updatedAgoLabel} 
         loading={loading} 
         refreshing={refreshing} 
         fetchAll={fetchAll} 
-      />
+        activePage={activePage}
+        setActivePage={setActivePage}
+        isLightMode={isLightMode}
+        setIsLightMode={setIsLightMode}
+      >
+        <main className="px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+          {error ? (
+            <div className="mb-6 rounded-3xl border border-red-300/30 bg-red-500/10 backdrop-blur-[32px] backdrop-saturate-150 px-6 py-5 text-sm text-red-700/90 shadow-[0_12px_32px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)]">
+              <div className="font-semibold text-red-800">Failed to load</div>
+              <div className="mt-1 font-mono text-xs text-red-600/85">{error}</div>
+            </div>
+          ) : null}
 
-      <main className="mx-auto w-full max-w-7xl px-4 pb-10 pt-6 sm:px-6 lg:px-8">
-        {error ? (
-          <div className="mb-6 rounded-3xl border border-red-300/40 bg-red-50/30 backdrop-blur-[28px] backdrop-saturate-150 px-5 py-4 text-sm text-red-700/90 shadow-[0_8px_24px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.4)]">
-            <div className="font-semibold text-red-800">Failed to load</div>
-            <div className="mt-1 font-mono text-xs text-red-600/85">{error}</div>
-          </div>
-        ) : null}
-
-        <MetricsSection metrics={metrics} trends={trends} />
-        <LeadsSection 
-          leadsOverviewSeries={leadsOverviewSeries}
-          leadsByStatus={leadsByStatus}
-          leadsRows={leadsRows}
-          loading={loading}
-          timeRange={timeRange}
-          setTimeRange={setTimeRange}
-          percent={percent}
-        />
-        <ActivitySection 
-          convRows={convRows}
-          taskRows={taskRows}
-          recentConversations={recentConversations}
-          upcomingTasks={upcomingTasks}
-          loading={loading}
-          timeAgo={timeAgo}
-          fmtDate={fmtDate}
-        />
-      </main>
+          {/* Render different pages based on activePage state */}
+          {activePage === "dashboard" ? (
+            <>
+              <MetricsSection metrics={metrics} trends={trends} isLightMode={isLightMode} />
+              <LeadsSection 
+                leadsOverviewSeries={leadsOverviewSeries}
+                leadsByStatus={leadsByStatus}
+                leadsRows={leadsRows}
+                loading={loading}
+                timeRange={timeRange}
+                setTimeRange={setTimeRange}
+                percent={percent}
+                isLightMode={isLightMode}
+              />
+              <ActivitySection 
+                convRows={convRows}
+                taskRows={taskRows}
+                recentConversations={recentConversations}
+                upcomingTasks={upcomingTasks}
+                loading={loading}
+                timeAgo={timeAgo}
+                fmtDate={fmtDate}
+                isLightMode={isLightMode}
+              />
+            </>
+          ) : activePage === "leads" ? (
+            <LeadsPage 
+              data={data}
+              loading={loading}
+              refreshing={refreshing}
+              fetchAll={fetchAll}
+              timeRange={timeRange}
+              setTimeRange={setTimeRange}
+              percent={percent}
+              isLightMode={isLightMode}
+            />
+          ) : activePage === "conversations" ? (
+            <ConversationsPage 
+              data={data}
+              loading={loading}
+              refreshing={refreshing}
+              fetchAll={fetchAll}
+              timeAgo={timeAgo}
+              isLightMode={isLightMode}
+            />
+          ) : activePage === "tasks" ? (
+            <TasksPage 
+              data={data}
+              loading={loading}
+              refreshing={refreshing}
+              fetchAll={fetchAll}
+              timeAgo={timeAgo}
+            />
+          ) : activePage === "deals" ? (
+            <DealsPage 
+              data={data}
+              loading={loading}
+              refreshing={refreshing}
+              fetchAll={fetchAll}
+            />
+          ) : null}
+        </main>
+      </Sidebar>
     </div>
   );
 }
