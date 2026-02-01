@@ -9,14 +9,15 @@ export default function ActivitySection({
   loading, 
   timeAgo, 
   fmtDate,
-  isLightMode = false
+  isLightMode = false,
+  onConversationClick
 }) {
   return (
     <section className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-12">
       <div className={`lg:col-span-7 rounded-2xl p-5 sm:p-6 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
       isLightMode
-  ? "bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50"
-  : "bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10"
+         ? "bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50"
+         : "bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10"
   }`}>
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -43,27 +44,31 @@ export default function ActivitySection({
                 ) : recentConversations.length === 0 ? (
                   <tr><td colSpan={5} className={`px-4 py-10 text-center text-sm ${isLightMode ? 'text-black' : 'text-gray-400/80'}`}>No conversations found.</td></tr>
                 ) : (
-                  recentConversations.map((c) => (
-                    <tr key={c.id || `${c.name}-${c.phone}`} className={`transition-all duration-200 ${isLightMode ? 'hover:bg-gray-50' : 'hover:bg-white/10'}`}>
+                  recentConversations.map((group) => (
+                    <tr 
+                      key={group.name || group.phone || group.conversations[0]?.id} 
+                      className={`transition-all duration-200 cursor-pointer ${isLightMode ? 'hover:bg-gray-50' : 'hover:bg-white/10'}`}
+                      onClick={() => onConversationClick && onConversationClick(group)}
+                    >
                       <TdGlass>
-                        <div className={`font-medium ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{c.name || "—"}</div>
-                        <div className={`mt-1 sm:hidden font-mono text-xs ${isLightMode ? 'text-black' : 'text-gray-400/80'}`}>{c.phone || "—"}</div>
+                        <div className={`font-medium ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{group.name || group.phone || "—"}</div>
+                        <div className={`mt-1 sm:hidden font-mono text-xs ${isLightMode ? 'text-black' : 'text-gray-400/80'}`}>{group.phone || "—"}</div>
                       </TdGlass>
                       <TdGlass className="hidden sm:table-cell">
-                        <div className={`font-mono text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{c.phone || "—"}</div>
+                        <div className={`font-mono text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{group.phone || "—"}</div>
                       </TdGlass>
                       <TdGlass>
                         <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs ${
                           isLightMode 
                             ? 'border-gray-200 bg-gray-100 text-gray-700' 
                             : 'border-white/20 bg-white/12 backdrop-blur-sm text-gray-300/90'
-                        }`}>{c.channel || "—"}</span>
+                        }`}>{group.channel || "—"}</span>
                       </TdGlass>
                       <TdGlass className="hidden md:table-cell">
-                        <div className={`text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{c.lastMessageAt ? timeAgo(c.lastMessageAt) : "—"}</div>
+                        <div className={`text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{group.lastMessageAt ? timeAgo(group.lastMessageAt) : "—"}</div>
                       </TdGlass>
                       <TdGlass className="hidden lg:table-cell">
-                        <div className={`max-w-[260px] truncate text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{c.snippet || "—"}</div>
+                        <div className={`max-w-[260px] truncate text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{group.snippet || "—"}</div>
                       </TdGlass>
                     </tr>
                   ))

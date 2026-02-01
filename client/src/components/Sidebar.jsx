@@ -114,7 +114,7 @@ export default function Sidebar({
                 <IconBolt />
               </div>
               {isExpanded && (
-                <span className="text-sm font-semibold">Dashboard</span>
+                <span className="text-sm font-semibold">Harbour AI</span>
               )}
             </div>
 
