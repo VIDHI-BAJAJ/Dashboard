@@ -145,6 +145,8 @@ import {
   BarChart,
   Bar,
   Cell,
+  RadialBarChart,
+  PolarAngleAxis,
 } from "recharts";
 import {
   Segment,
@@ -162,6 +164,8 @@ export default function LeadsSection({
   setTimeRange,
   percent,
   isLightMode = false,
+  targetRevenue = 1000000,
+  achievedRevenue = 600000,
 }) {
   const glassBase =
     "rounded-2xl p-5 sm:p-6 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105";
@@ -172,8 +176,86 @@ export default function LeadsSection({
   const glassDark =
     "bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10";
 
+  const getMotivationalText = (percentage) => {
+    if (percentage >= 0 && percentage <= 20) {
+      return "Let’s get started 🚀";
+    } else if (percentage > 20 && percentage <= 40) {
+      return "Good start, keep going 💪";
+    } else if (percentage > 40 && percentage <= 60) {
+      return "You’re halfway there 🔥";
+    } else if (percentage > 60 && percentage <= 80) {
+      return "Great progress, almost there 👏";
+    } else if (percentage > 80 && percentage <= 100) {
+      return "Target almost achieved! 🎯";
+    }
+    return "Keep pushing!";
+  };
+
+  const calculatePercentage = (achieved, target) => {
+    if (target === 0) return 0;
+    const percentage = (achieved / target) * 100;
+    return Math.min(Math.max(percentage, 0), 100); // Clamp between 0 and 100
+  };
+
+  const percentage = calculatePercentage(achievedRevenue, targetRevenue);
+
   return (
     <section className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-12">
+      {/* Revenue Card - New Card */}
+      <div
+        className={`lg:col-span-4 ${glassBase} ${
+          isLightMode ? glassLight : glassDark
+        }`}
+      >
+        {/* highlight line */}
+        <div />
+
+        <div className="flex flex-col gap-3">
+          <div>
+            <div className="text-base font-semibold">Revenue</div>
+          </div>
+        </div>
+
+        <div className="mt-5 h-[260px] flex items-center justify-center">
+          <div className="flex flex-col items-center">
+            <div className="text-xs text-center mb-4 text-gray-500 dark:text-gray-400">
+              {getMotivationalText(percentage)}
+            </div>
+            <div className="relative w-32 h-16">
+              {/* Background track */}
+              <svg viewBox="0 0 100 50" className="w-full h-full">
+                <path
+                  d="M10,50 A40,40 0 0,1 90,50"
+                  fill="none"
+                  stroke={isLightMode ? "#e5e7eb" : "#374151"}
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
+                {/* Progress track */}
+                <path
+                  d="M10,50 A40,40 0 0,1 90,50"
+                  fill="none"
+                  stroke={isLightMode ? "#3b82f6" : "#60a5fa"}
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={`${percentage * 2.51} 251`} // 2.51 ≈ half circumference (π * r where r=40)
+                />
+              </svg>
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
+                <div className="text-lg font-bold">
+                  {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(achievedRevenue)}
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 text-center">
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                of {new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(targetRevenue)} target
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Leads Overview */}
       <div
         className={`lg:col-span-8 ${glassBase} ${
@@ -181,7 +263,7 @@ export default function LeadsSection({
         }`}
       >
         {/* highlight line */}
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40" />
+        <div />
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>

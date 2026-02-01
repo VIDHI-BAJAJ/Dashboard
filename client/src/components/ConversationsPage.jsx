@@ -41,7 +41,7 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
           isLightMode
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'

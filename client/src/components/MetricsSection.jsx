@@ -4,7 +4,7 @@ import {
   MessageCircle,
   CheckCircle,
   Trophy,
-  TrendingUp,
+  ChartNoAxesCombined,
   ArrowUp,
   ArrowDown,
 } from "lucide-react";
@@ -29,8 +29,8 @@ export default function MetricsSection({ metrics, trends, isLightMode }) {
       title: "Speed To Lead",
       value: metrics.activeConversations,
       trend: trends?.conv,
-      icon: <TrendingUp size={20} />,
-      tint: "red",
+      icon: <ChartNoAxesCombined size={20} />,
+      tint: "green",
     },
     {
       title: "Tasks Due Today",
@@ -49,7 +49,7 @@ export default function MetricsSection({ metrics, trends, isLightMode }) {
   ];
 
   return (
-    <section className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-5">
+    <section className="mb-8 grid grid-cols-2 gap-6 sm:grid-cols-2 xl:grid-cols-5">
       {cards.map((card) => (
         <div
           key={card.title}
@@ -63,7 +63,7 @@ export default function MetricsSection({ metrics, trends, isLightMode }) {
           `}
         >
           {/* soft highlight line (Apple-like) */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/40" />
+          <div/>
 
           {/* header */}
           <div className="mb-4 flex items-center justify-between">
@@ -82,9 +82,9 @@ export default function MetricsSection({ metrics, trends, isLightMode }) {
                   card.tint === "pink" &&
                   "bg-pink-400/20 text-pink-300"
                 }
-                ${
-                  card.tint === "red" &&
-                  "bg-red-400/20 text-red-300"
+                 ${
+                  card.tint === "green" &&
+                  "bg-green-400/20 text-green-300"
                 }
                 ${
                   card.tint === "indigo" &&

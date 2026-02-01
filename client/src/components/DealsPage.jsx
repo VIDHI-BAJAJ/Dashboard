@@ -121,7 +121,7 @@ export default function DealsPage({ data, loading, refreshing, fetchAll, isLight
       </div>
 
       {/* Deals by Status */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
         {Object.entries(dealsByStatus).map(([status, deals]) => (
           <div key={status} className={`rounded-2xl backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
             isLightMode
