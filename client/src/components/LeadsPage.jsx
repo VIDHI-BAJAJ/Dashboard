@@ -116,7 +116,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
         <div className={`p-5 border-b ${isLightMode ? 'border-gray-200/40' : 'border-white/10'}`}>
           <h2 className={`text-lg font-semibold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>All Leads</h2>
         </div>
-        <div className="overflow-x-auto">
+        <div>
           <table className="w-full">
             <thead>
               <tr className={`border-b ${isLightMode ? 'border-gray-200' : 'border-white/10'}`}>

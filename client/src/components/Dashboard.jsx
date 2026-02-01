@@ -252,7 +252,7 @@ export default function Dashboard() {
   }, [taskRows]);
 
   return (
-    <div className={`min-h-screen transition-all duration-500 ${
+    <div className={`relative min-h-screen transition-all duration-500 ${
      isLightMode
 ? "bg-gradient-to-br from-rose-200 via-purple-200 to-blue-200 text-gray-900"
 : "bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 text-gray-100"

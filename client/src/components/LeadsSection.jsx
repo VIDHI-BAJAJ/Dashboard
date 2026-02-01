@@ -364,7 +364,7 @@ export default function LeadsSection({
 
               <div className="flex items-center gap-3">
                 <div
-                  className={`h-2 w-28 overflow-hidden rounded-full ${
+                  className={`h-2 w-28  rounded-full ${
                     isLightMode ? "bg-gray-200" : "bg-white/20"
                   }`}
                 >

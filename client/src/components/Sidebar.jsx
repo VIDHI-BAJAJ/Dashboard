@@ -66,7 +66,7 @@ export default function Sidebar({
     <>
       {/* ================= MOBILE BOTTOM NAV (FIXED & ALWAYS VISIBLE) ================= */}
       {isMobile && (
-        <nav className="fixed inset-x-0 bottom-0 z-[9999] pointer-events-auto">
+       <nav className="fixed inset-x-0 bottom-0 z-[99999] pointer-events-auto transform-none">
           <div className="px-2 pb-2">
             <div
               className={`flex items-center justify-around rounded-3xl px-2 py-3

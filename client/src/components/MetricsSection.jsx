@@ -53,7 +53,7 @@ export default function MetricsSection({ metrics, trends, isLightMode }) {
       {cards.map((card) => (
         <div
           key={card.title}
-          className={`relative overflow-hidden rounded-2xl p-6 backdrop-blur-xl
+          className={`relative rounded-2xl p-6 backdrop-blur-xl
             border rounded-2xl transition-all duration-300 hover:scale-105
             ${
               isLightMode

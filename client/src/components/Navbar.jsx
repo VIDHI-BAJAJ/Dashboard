@@ -29,7 +29,7 @@ export default function Sidebar({ updatedAgoLabel, loading, refreshing, fetchAll
               <IconBolt />
             </div>
             {isExpanded && (
-              <div className="overflow-hidden">
+              <div>
                 <div className="text-sm font-semibold text-gray-100 whitespace-nowrap">FinCRM</div>
                 <div className="text-xs text-gray-400/80 whitespace-nowrap">Dashboard</div>
               </div>
@@ -37,7 +37,7 @@ export default function Sidebar({ updatedAgoLabel, loading, refreshing, fetchAll
           </div>
 
           {/* Menu Items */}
-          <nav className="flex-1 py-2 overflow-hidden">
+          <nav className="flex-1 py-2">
             <ul className="space-y-1 px-2">
               {menuItems.map((item) => (
                 <li key={item.id}>
@@ -107,7 +107,7 @@ export default function Sidebar({ updatedAgoLabel, loading, refreshing, fetchAll
               >
                 <IconBell />
               </button>
-              <div className="h-10 w-10 overflow-hidden rounded-3xl border border-white/20 bg-white/15 backdrop-blur-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.5)]" />
+              <div className="h-10 w-10 rounded-3xl border border-white/20 bg-white/15 backdrop-blur-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.08),inset_0_1px_0_rgba(255,255,255,0.5)]" />
             </div>
           </div>
         </header>
