@@ -36,7 +36,7 @@ export default function LeadDetails({ lead, onBack, loading, refreshing, fetchAl
             type="button"
             onClick={() => fetchAll({ isRefresh: true })}
             disabled={loading || refreshing}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 min-w-[100px] ${
               isLightMode
                 ? 'border border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200'
                 : 'border border-white/20 bg-white/15 backdrop-blur-[24px] text-gray-300 hover:bg-white/20 hover:border-white/25 shadow-[0_2px_12px_rgba(0,0,0,0.08)]'
@@ -48,7 +48,7 @@ export default function LeadDetails({ lead, onBack, loading, refreshing, fetchAl
           <button
             type="button"
             onClick={onBack}
-            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
+            className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 min-w-[120px] ${
               isLightMode
                 ? 'border border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200'
                 : 'border border-white/20 bg-white/15 backdrop-blur-[24px] text-gray-300 hover:bg-white/20 hover:border-white/25 shadow-[0_2px_12px_rgba(0,0,0,0.08)]'
