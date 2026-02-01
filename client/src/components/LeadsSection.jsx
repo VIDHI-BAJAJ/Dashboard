@@ -120,8 +120,8 @@ export default function LeadsSection({
             </svg>
             
             {/* Center value */}
-            <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center">
-              <div className="text-xl font-bold">
+            <div className="absolute top-[60%] left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-center mt-2">
+              <div className="text-xl font-bold mt-12">
                 {new Intl.NumberFormat('en-IN', { 
                   style: 'currency', 
                   currency: 'INR', 
