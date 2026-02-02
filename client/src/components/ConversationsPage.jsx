@@ -119,7 +119,7 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Total Conversations</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>Total Conversations</div>
           <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{convRows.length}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
@@ -127,7 +127,7 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>WhatsApp</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>WhatsApp</div>
           <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>
             {convRows.filter(c => c.channel?.toLowerCase().includes('whatsapp')).length}
           </div>
@@ -137,7 +137,7 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Email</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>Email</div>
           <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>
             {convRows.filter(c => c.channel?.toLowerCase().includes('email')).length}
           </div>
@@ -178,7 +178,7 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
                         </div>
                       </div>
                       <div className="ml-13">
-                        <p className={`text-sm mb-2 ${isLightMode ? 'text-gray-700' : 'text-gray-300'}`}>{group.snippet || "No message content"}</p>
+                        <p className={`text-sm mb-2 ${isLightMode ? 'text-black' : 'text-gray-300'}`}>{group.snippet || "No message content"}</p>
                         <div className="flex items-center gap-4 text-xs text-gray-500">
                           <span className="inline-flex items-center gap-1">
                             <span className="w-2 h-2 rounded-full bg-green-500"></span>
@@ -203,12 +203,11 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
             {groupedConversations.length > 0 && (
               <div className={`p-4 border-t ${isLightMode ? 'border-gray-200' : 'border-white/10'}`}>
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-                  <div className={`text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'} text-center sm:text-left`}>
-                    Showing <span className="font-medium">{indexOfFirstGroup + 1}</span> to{' '}
+                  <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300'} text-center sm:text-left`}>
+                    Showing <span className="font-medium">{indexOfFirstGroup + 1}</span> to {' '}
                     <span className="font-medium">
                       {Math.min(indexOfLastGroup, groupedConversations.length)}
-                    </span>{' '}
-                    of <span className="font-medium">{groupedConversations.length}</span> contacts
+                    </span> of <span className="font-medium">{groupedConversations.length}</span> contacts
                   </div>
                   <div className="flex items-center flex-wrap justify-center sm:justify-end gap-1 sm:gap-2">
                     <button
@@ -268,7 +267,7 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
                         </button>
                         
                         {/* Ellipsis after first page */}
-                        {currentPage > 3 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>...</span>}
+                        {currentPage > 3 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-black' : 'text-gray-400'}`}>...</span>}
                         
                         {/* Pages around current page */}
                         {currentPage > 2 && currentPage < totalGroupPages && (
@@ -311,7 +310,7 @@ export default function ConversationsPage({ data, loading, refreshing, fetchAll,
                         )}
                         
                         {/* Ellipsis before last page */}
-                        {currentPage < totalGroupPages - 2 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>...</span>}
+                        {currentPage < totalGroupPages - 2 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-black' : 'text-gray-400'}`}>...</span>}
                         
                         {/* Last page */}
                         <button

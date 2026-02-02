@@ -35,7 +35,7 @@ export default function LeadsSection({
   achievedRevenue = 0,
 }) {
   const glassBase =
-    "rounded-2xl p-5 sm:p-6 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105";
+    "rounded-2xl p-4 sm:p-6 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105";
 
   const glassLight =
     "bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50";
@@ -69,13 +69,12 @@ export default function LeadsSection({
   const percentage = calculatePercentage(achievedRevenue, targetRevenue);
 
   return (
-    <section className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-15">
+    <section className="mt-6 grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-1 lg:grid-cols-15">
       {/* Revenue/Profit Card */}
       <div
-        className={`lg:col-span-4 ${glassBase} ${
+        className={`md:col-span-1 lg:col-span-4 ${glassBase} ${
           isLightMode ? glassLight : glassDark
-        }`}
-      >
+        }`}>
         <div className="flex flex-col gap-2">
           <div className="text-base font-semibold">Revenue Progress</div>
           <div className="text-sm text-center mb-2 font-medium text-white dark:text-gray-200">
@@ -151,10 +150,9 @@ export default function LeadsSection({
 
       {/* Leads Overview */}
       <div
-        className={`lg:col-span-7 ${glassBase} ${
+        className={`md:col-span-1 lg:col-span-7 ${glassBase} ${
           isLightMode ? glassLight : glassDark
-        }`}
-      >
+        }`}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <div className="text-base font-semibold">Leads overview</div>
@@ -174,13 +172,13 @@ export default function LeadsSection({
           />
         </div>
 
-        <div className="mt-5 h-[260px]">
+        <div className="mt-5 h-[320px] sm:h-[260px]">
           <ChartFrame
             loading={loading}
             empty={leadsOverviewSeries.length === 0}
             isLightMode={isLightMode}
           >
-            <ResponsiveContainer width="100%" height={220}>
+            <ResponsiveContainer width="100%" height={280}>
               <LineChart data={leadsOverviewSeries}>
                 <defs>
                   <linearGradient id="leadsGradient" x1="0" y1="0" x2="0" y2="1">
@@ -236,7 +234,7 @@ export default function LeadsSection({
 
       {/* Leads By Status */}
       <div
-        className={`lg:col-span-4 ${glassBase} ${
+        className={`md:col-span-1 lg:col-span-4 ${glassBase} ${
           isLightMode ? glassLight : glassDark
         }`}
       >

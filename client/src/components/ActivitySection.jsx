@@ -13,8 +13,8 @@ export default function ActivitySection({
   onConversationClick
 }) {
   return (
-    <section className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-12">
-      <div className={`lg:col-span-7 rounded-2xl p-5 sm:p-6 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
+    <section className="mt-6 grid grid-cols-1 gap-5 md:grid-cols-1 lg:grid-cols-12">
+      <div className={`md:col-span-1 lg:col-span-7 rounded-2xl p-4 sm:p-5 md:p-6 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
       isLightMode
          ? "bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50"
          : "bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10"
@@ -55,20 +55,20 @@ export default function ActivitySection({
                         <div className={`mt-1 sm:hidden font-mono text-xs ${isLightMode ? 'text-black' : 'text-gray-400/80'}`}>{group.phone || "—"}</div>
                       </TdGlass>
                       <TdGlass className="hidden sm:table-cell">
-                        <div className={`font-mono text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{group.phone || "—"}</div>
+                        <div className={`font-mono text-sm ${isLightMode ? 'text-black' : 'text-gray-300/90'}`}>{group.phone || "—"}</div>
                       </TdGlass>
                       <TdGlass>
                         <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-xs ${
                           isLightMode 
-                            ? 'border-gray-200 bg-gray-100 text-gray-700' 
+                            ? 'border-gray-200 bg-gray-100 text-black' 
                             : 'border-white/20 bg-white/12 backdrop-blur-sm text-gray-300/90'
                         }`}>{group.channel || "—"}</span>
                       </TdGlass>
                       <TdGlass className="hidden md:table-cell">
-                        <div className={`text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{group.lastMessageAt ? timeAgo(group.lastMessageAt) : "—"}</div>
+                        <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/90'}`}>{group.lastMessageAt ? timeAgo(group.lastMessageAt) : "—"}</div>
                       </TdGlass>
                       <TdGlass className="hidden lg:table-cell">
-                        <div className={`max-w-[260px] truncate text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{group.snippet || "—"}</div>
+                        <div className={`max-w-[260px] truncate text-sm ${isLightMode ? 'text-black' : 'text-gray-300/90'}`}>{group.snippet || "—"}</div>
                       </TdGlass>
                     </tr>
                   ))
@@ -79,7 +79,7 @@ export default function ActivitySection({
         </div>
       </div>
 
-      <div className={`lg:col-span-5 rounded-2xl p-5 sm:p-6 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
+      <div className={`md:col-span-1 lg:col-span-5 rounded-2xl p-4 sm:p-5 md:p-6 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
        isLightMode
   ? "bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50"
   : "bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10"
@@ -119,13 +119,13 @@ export default function ActivitySection({
                   <div className={`mt-2 flex flex-wrap items-center gap-2 text-xs ${isLightMode ? 'text-black' : 'text-gray-400/80'}`}>
                     <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 ${
                       isLightMode
-                        ? 'border-gray-200 bg-gray-100 text-gray-700'
+                        ? 'border-gray-200 bg-gray-100 text-black'
                         : 'border-white/20 bg-white/15 backdrop-blur-sm text-gray-300/90'
                     }`}>{t.status || "No status"}</span>
                     {t.priority ? (
                       <span className={`inline-flex items-center rounded-full border px-2.5 py-0.5 ${
                         isLightMode
-                          ? 'border-gray-200 bg-gray-100 text-gray-700'
+                          ? 'border-gray-200 bg-gray-100 text-black'
                           : 'border-white/20 bg-white/15 backdrop-blur-sm text-gray-300/90'
                       }`}>{t.priority}</span>
                     ) : null}

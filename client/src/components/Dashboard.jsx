@@ -375,7 +375,7 @@ export default function Dashboard() {
     <div className={`relative min-h-screen transition-all duration-500 ${
      isLightMode
 ? "bg-gradient-to-br from-rose-200 via-purple-200 to-blue-200 text-gray-900"
-: "bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900 text-gray-100"
+: "bg-gradient-to-br from-black  to-purple-900 text-gray-100"
 
     }`}>
 
@@ -389,7 +389,7 @@ export default function Dashboard() {
         isLightMode={isLightMode}
         setIsLightMode={setIsLightMode}
       >
-        <main className="px-4 pb-10 pt-6 sm:px-6 lg:px-8">
+        <main className="px-4 pb-10 pt-4 sm:pt-6 sm:px-6 lg:px-8">
           {error ? (
             <div className="mb-6 rounded-3xl border border-red-300/30 bg-red-500/10 backdrop-blur-[32px] backdrop-saturate-150 px-6 py-5 text-sm text-red-700/90 shadow-[0_12px_32px_rgba(0,0,0,0.1),inset_0_1px_0_rgba(255,255,255,0.2)]">
               <div className="font-semibold text-red-800">Failed to load</div>

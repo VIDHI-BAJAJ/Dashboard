@@ -109,7 +109,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Total Leads</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>Total Leads</div>
           <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{leadsRows.length}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
@@ -117,7 +117,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>New</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>New</div>
           <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{leadsByStatus.New?.length || 0}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
@@ -125,7 +125,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Engaged</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>Engaged</div>
           <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{leadsByStatus.Engaged?.length || 0}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
@@ -133,7 +133,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Converted</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>Converted</div>
           <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{leadsByStatus.Won?.length || 0}</div>
         </div>
       </div>
@@ -166,7 +166,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
                   onClick={() => onLeadSelect && onLeadSelect(lead.id)}
                 >
                   <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{lead.fullName || "Unknown"}</td>
-                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'}`}>{lead.phone || "-"}</td>
+                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-black' : 'text-gray-300'}`}>{lead.phone || "-"}</td>
                   <td className="px-5 py-4">
                     <span className={`inline-flex px-2 py-1 text-xs rounded-full ${isLightMode
                       ? (lead.status === "New" ? "bg-blue-100 text-blue-700" :
@@ -181,8 +181,8 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
                       {lead.status || "New"}
                     </span>
                   </td>
-                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'}`}>{lead.source || "-"}</td>
-                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'}`}>
+                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-black' : 'text-gray-300'}`}>{lead.source || "-"}</td>
+                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-black' : 'text-gray-300'}`}>
                     {lead.createdAt ? lead.createdAt.toLocaleDateString() : "-"}
                   </td>
                 </tr>
@@ -191,7 +191,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
           </table>
         </div>
         {leadsRows.length === 0 && (
-          <div className={`p-10 text-center ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>
+          <div className={`p-10 text-center ${isLightMode ? 'text-black' : 'text-gray-400'}`}>
             No leads found
           </div>
         )}
@@ -199,12 +199,11 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
         {leadsRows.length > 0 && (
           <div className={`p-4 border-t ${isLightMode ? 'border-gray-200' : 'border-white/10'}`}>
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4">
-              <div className={`text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'} text-center sm:text-left`}>
-                Showing <span className="font-medium">{indexOfFirstLead + 1}</span> to{' '}
+              <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300'} text-center sm:text-left`}>
+                Showing <span className="font-medium">{indexOfFirstLead + 1}</span> to {' '}
                 <span className="font-medium">
                   {Math.min(indexOfLastLead, leadsRows.length)}
-                </span>{' '}
-                of <span className="font-medium">{leadsRows.length}</span> leads
+                </span> of <span className="font-medium">{leadsRows.length}</span> leads
               </div>
               <div className="flex items-center flex-wrap justify-center sm:justify-end gap-1 sm:gap-2">
                 <button
@@ -265,7 +264,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
                     </button>
                             
                     {/* Ellipsis after first page */}
-                    {currentPage > 3 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>...</span>}
+                    {currentPage > 3 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-black' : 'text-gray-400'}`}>...</span>}
                             
                     {/* Pages around current page */}
                     {currentPage > 2 && currentPage < totalPages && (
@@ -308,7 +307,7 @@ export default function LeadsPage({ data, loading, refreshing, fetchAll, timeRan
                     )}
                             
                     {/* Ellipsis before last page */}
-                    {currentPage < totalPages - 2 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-gray-500' : 'text-gray-400'}`}>...</span>}
+                    {currentPage < totalPages - 2 && <span className={`px-1 text-xs sm:text-sm ${isLightMode ? 'text-black' : 'text-gray-400'}`}>...</span>}
                             
                     {/* Last page */}
                     <button

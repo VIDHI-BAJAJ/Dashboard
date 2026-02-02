@@ -126,9 +126,9 @@ export default function Sidebar({
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-sm liquid-hover ${
                     activePage === item.id
                       ? isLightMode
-                        ? "bg-white/70 border border-white/40"
-                        : "bg-white/20 border border-white/20"
-                      : "hover:bg-white/20"
+                        ? "bg-white/70 border border-white/40 text-black"
+                        : "bg-white/20 border border-white/20 "
+                      : "hover:bg-white/10"
                   }`}
                 >
                   {item.icon}

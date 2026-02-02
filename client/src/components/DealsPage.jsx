@@ -44,7 +44,7 @@ export default function DealsPage({ data, loading, refreshing, fetchAll, isLight
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className={`text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>Deals</h1>
+          <h1 className={`text-2xl font-bold ${isLightMode ? 'text-black' : 'text-gray-100'}`}>Deals</h1>
           <p className={`mt-1 ${isLightMode ? 'text-black' : 'text-gray-400'}`}>Track your sales pipeline and revenue</p>
         </div>
         <button
@@ -53,7 +53,7 @@ export default function DealsPage({ data, loading, refreshing, fetchAll, isLight
           disabled={loading || refreshing}
           className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
             isLightMode
-              ? 'border border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200'
+              ? 'border border-gray-200 bg-gray-100 text-black hover:bg-gray-200'
               : 'border border-white/20 bg-white/15 backdrop-blur-[24px] text-gray-300 hover:bg-white/20 hover:border-white/25 shadow-[0_2px_12px_rgba(0,0,0,0.08)]'
           }`}>
         
@@ -69,32 +69,32 @@ export default function DealsPage({ data, loading, refreshing, fetchAll, isLight
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
           }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Total Deals</div>
-          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{totalDeals}</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>Total Deals</div>
+          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-white'}`}>{totalDeals}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
           isLightMode
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
           }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Won Deals</div>
-          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-green-600' : 'text-green-400'}`}>{wonDeals}</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>Won Deals</div>
+          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-white'}`}>{wonDeals}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
           isLightMode
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
           }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Open Deals</div>
-          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-yellow-600' : 'text-yellow-400'}`}>{openDeals}</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>Open Deals</div>
+          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-white'}`}>{openDeals}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
           isLightMode
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
           }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Total Value</div>
-          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>${totalValue.toLocaleString()}</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>Total Value</div>
+          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-white'}`}>${totalValue.toLocaleString()}</div>
         </div>
       </div>
 
@@ -106,14 +106,14 @@ export default function DealsPage({ data, loading, refreshing, fetchAll, isLight
         }`}>
         <div className="flex items-center justify-between">
           <div>
-            <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Win Rate</div>
+            <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>Win Rate</div>
             <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>
               {totalDeals > 0 ? Math.round((wonDeals / totalDeals) * 100) : 0}%
             </div>
           </div>
           <div className="text-right">
-            <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Revenue Generated</div>
-            <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-green-600' : 'text-green-400'}`}>
+            <div className={`text-sm ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>Revenue Generated</div>
+            <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-green-400'}`}>
               ${wonValue.toLocaleString()}
             </div>
           </div>
@@ -189,7 +189,7 @@ export default function DealsPage({ data, loading, refreshing, fetchAll, isLight
               {dealRows.slice(0, 8).map((deal) => (
                 <tr key={deal.id} className={`transition-colors ${isLightMode ? 'hover:bg-gray-50' : 'hover:bg-white/5'}`}>
                   <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{deal.name || "Unnamed Deal"}</td>
-                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'}`}>{deal.contact || "-"}</td>
+                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-black' : 'text-gray-300'}`}>{deal.contact || "-"}</td>
                   <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>
                     {deal.value ? `$${deal.value.toLocaleString()}` : "-"}
                   </td>
@@ -202,7 +202,7 @@ export default function DealsPage({ data, loading, refreshing, fetchAll, isLight
                       {deal.status || "Open"}
                     </span>
                   </td>
-                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-300'}`}>
+                  <td className={`px-5 py-4 text-sm ${isLightMode ? 'text-black' : 'text-gray-300'}`}>
                     {deal.createdAt ? deal.createdAt.toLocaleDateString() : "-"}
                   </td>
                 </tr>

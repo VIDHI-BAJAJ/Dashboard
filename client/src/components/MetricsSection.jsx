@@ -49,11 +49,11 @@ export default function MetricsSection({ metrics, trends, isLightMode }) {
   ];
 
   return (
-    <section className="mb-8 grid grid-cols-2 gap-6 sm:grid-cols-2 xl:grid-cols-5">
+    <section className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 xl:grid-cols-5 gap-4 sm:gap-6">
       {cards.map((card) => (
         <div
           key={card.title}
-          className={`relative rounded-2xl p-6 backdrop-blur-xl
+          className={`relative rounded-2xl p-4 sm:p-6 backdrop-blur-xl
             border rounded-2xl transition-all duration-300 hover:scale-105
             ${
               isLightMode
@@ -114,7 +114,7 @@ export default function MetricsSection({ metrics, trends, isLightMode }) {
                 className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium
                   ${
                     card.trend.direction === "up"
-                      ? "bg-emerald-400/20 text-emerald-300"
+                      ? "bg-black-400/20 text-white-300"
                       : card.trend.direction === "down"
                       ? "bg-red-400/20 text-red-300"
                       : "bg-gray-400/20 text-gray-300"

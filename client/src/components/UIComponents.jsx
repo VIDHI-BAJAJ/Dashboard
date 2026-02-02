@@ -60,7 +60,7 @@ export function MetricCard({ title, value, trend, accent, icon, isLightMode = fa
     }`}>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className={`text-xs font-medium uppercase tracking-wide ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>{title}</div>
+          <div className={`text-xs font-medium uppercase tracking-wide ${isLightMode ? 'text-black' : 'text-gray-300/80'}`}>{title}</div>
           <div className={`mt-3 text-3xl sm:text-4xl font-semibold tracking-tight ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>
             {Number.isFinite(value) ? value : 0}
           </div>
@@ -175,8 +175,8 @@ export function TdGlass({ children, className = "" }) {
 }
 
 export function ChartFrame({ loading, empty, children, isLightMode = false }) {
-  if (loading) return <div className={`grid h-full place-items-center text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-400/80'}`}>Loading…</div>;
-  if (empty) return <div className={`grid h-full place-items-center text-sm ${isLightMode ? 'text-gray-700' : 'text-gray-400/80'}`}>No data.</div>;
+  if (loading) return <div className={`grid h-full place-items-center text-sm ${isLightMode ? 'text-black' : 'text-gray-400/80'}`}>Loading…</div>;
+  if (empty) return <div className={`grid h-full place-items-center text-sm ${isLightMode ? 'text-black' : 'text-gray-400/80'}`}>No data.</div>;
   return <>{children}</>;
 }
 
@@ -186,7 +186,7 @@ export function GlassTooltip({ active, payload, label, isLightMode = false }) {
   return (
     <div className={`rounded-xl border ${isLightMode ? 'border-gray-300 bg-white shadow-sm' : 'border-white/20 bg-white/15 backdrop-blur-[24px] shadow-[0_4px_20px_rgba(0,0,0,0.1)]'} px-3 py-2 text-xs`}>
       <div className={`font-semibold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{label || p?.name || "—"}</div>
-      <div className={`mt-0.5 ${isLightMode ? 'text-gray-700' : 'text-gray-300/90'}`}>{p?.value ?? "—"}</div>
+      <div className={`mt-0.5 ${isLightMode ? 'text-black' : 'text-gray-300/90'}`}>{p?.value ?? "—"}</div>
     </div>
   );
 }

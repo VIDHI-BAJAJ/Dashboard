@@ -61,8 +61,8 @@ export default function TasksPage({ data, loading, refreshing, fetchAll, timeAgo
           disabled={loading || refreshing}
           className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
             isLightMode
-              ? 'border border-gray-200 bg-gray-100 text-gray-600 hover:bg-gray-200'
-              : 'border border-white/20 bg-white/15 backdrop-blur-[24px] text-gray-300 hover:bg-white/20 hover:border-white/25 shadow-[0_2px_12px_rgba(0,0,0,0.08)]'
+              ? 'border border-gray-200 bg-gray-100 text-black hover:bg-gray-200'
+              : 'border border-white/20 bg-white/15 backdrop-blur-[24px] text-white hover:bg-white/20 hover:border-white/25 shadow-[0_2px_12px_rgba(0,0,0,0.08)]'
           }`}>
         
           <IconRefresh className={`${(loading || refreshing) ? 'animate-spin' : ''}`} />
@@ -75,34 +75,34 @@ export default function TasksPage({ data, loading, refreshing, fetchAll, timeAgo
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
           isLightMode
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
-            : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
+            : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10 '
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Total Tasks</div>
-          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{taskRows.length}</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>Total Tasks</div>
+          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-white'}`}>{taskRows.length}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
           isLightMode
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Pending</div>
-          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{tasksByStatus.pending.length}</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>Pending</div>
+          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-white'}`}>{tasksByStatus.pending.length}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
           isLightMode
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>In Progress</div>
-          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{tasksByStatus.inProgress.length}</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>In Progress</div>
+          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-white'}`}>{tasksByStatus.inProgress.length}</div>
         </div>
         <div className={`rounded-2xl p-5 backdrop-blur-xl border rounded-2xl transition-all duration-300 hover:scale-105 ${
           isLightMode
             ? 'bg-white/30 border-white/50 text-gray-900 shadow-xl hover:bg-white/50'
             : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
         }`}>
-          <div className={`text-sm ${isLightMode ? 'text-gray-600' : 'text-gray-300/80'}`}>Completed</div>
-          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>{tasksByStatus.completed.length}</div>
+          <div className={`text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>Completed</div>
+          <div className={`mt-1 text-2xl font-bold ${isLightMode ? 'text-black' : 'text-white'}`}>{tasksByStatus.completed.length}</div>
         </div>
       </div>
 
@@ -116,8 +116,8 @@ export default function TasksPage({ data, loading, refreshing, fetchAll, timeAgo
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
             <div>
-              <h3 className={`font-semibold ${isLightMode ? 'text-red-600' : 'text-red-300'}`}>Overdue Tasks</h3>
-              <p className={`text-sm ${isLightMode ? 'text-red-500/80' : 'text-red-500/85'}`}>
+              <h3 className={`font-semibold ${isLightMode ? 'text-black' : 'text-white'}`}>Overdue Tasks</h3>
+              <p className={`text-sm ${isLightMode ? 'text-black' : 'text-white'} text-red-500`}>
                 You have {overdueTasks.length} task{overdueTasks.length > 1 ? 's' : ''} past due date
               </p>
             </div>
@@ -132,7 +132,7 @@ export default function TasksPage({ data, loading, refreshing, fetchAll, timeAgo
           : 'bg-white/5 border-white/10 text-gray-100 shadow-xl hover:bg-white/10'
       }`}>
         <div className={`p-5 border-b ${isLightMode ? 'border-gray-200/40' : 'border-white/10'}`}>
-          <h2 className={`text-lg font-semibold ${isLightMode ? 'text-gray-900' : 'text-gray-100'}`}>All Tasks</h2>
+          <h2 className={`text-lg font-semibold ${isLightMode ? 'text-black' : 'text-white'}`}>All Tasks</h2>
         </div>
         <div className="divide-y divide-white/10">
           {taskRows.slice(0, 10).map((task) => (
@@ -155,24 +155,24 @@ export default function TasksPage({ data, loading, refreshing, fetchAll, timeAgo
                   <div className="flex items-start justify-between mb-2">
                     <h3 className={`font-medium ${
                       (task.status || "").toLowerCase().includes("complete")
-                        ? "text-gray-500 line-through"
-                        : "text-gray-100"
+                        ? "text-black/50 line-through"
+                        : "text-black"
                     }`}>
                       {task.title || "Untitled Task"}
                     </h3>
                     {task.priority && (
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         task.priority.toLowerCase() === "high" 
-                          ? "bg-red-500/20 text-red-300" 
+                          ? "bg-red-500/20 text-black" 
                           : task.priority.toLowerCase() === "medium"
-                          ? "bg-yellow-500/20 text-yellow-300"
-                          : "bg-blue-500/20 text-blue-300"
+                          ? "bg-yellow-500/20 text-black"
+                          : "bg-blue-500/20 text-black"
                       }`}>
                         {task.priority}
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-400">
+                  <div className={`flex items-center gap-4 text-sm ${isLightMode ? 'text-black' : 'text-white'}`}>
                     <span className="inline-flex items-center gap-1">
                       <span className={`w-2 h-2 rounded-full ${
                         (task.status || "").toLowerCase().includes("complete")
@@ -184,7 +184,7 @@ export default function TasksPage({ data, loading, refreshing, fetchAll, timeAgo
                       {task.status || "Pending"}
                     </span>
                     {task.dueAt && (
-                      <span className={task.dueAt < new Date() && !(task.status || "").toLowerCase().includes("complete") ? "text-red-400" : ""}>
+                      <span className={`${isLightMode ? 'text-black' : 'text-white'} ${task.dueAt < new Date() && !(task.status || "").toLowerCase().includes("complete") ? "text-red-500" : ""}`}>
                         Due: {task.dueAt.toLocaleDateString()}
                       </span>
                     )}
@@ -195,7 +195,7 @@ export default function TasksPage({ data, loading, refreshing, fetchAll, timeAgo
           ))}
         </div>
         {taskRows.length === 0 && (
-          <div className="p-10 text-center text-gray-400">
+          <div className={`p-10 text-center ${isLightMode ? 'text-black' : 'text-white'}`}>
             No tasks found
           </div>
         )}
