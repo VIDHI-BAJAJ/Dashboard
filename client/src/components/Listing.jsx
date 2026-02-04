@@ -1,7 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=338&fit=crop";
+
+const glassBase =
+  "rounded-2xl backdrop-blur-xl border transition-all duration-300";
+const glassLight =
+  "bg-white/30 border-white/50 text-gray-900 shadow-xl";
+const glassDark =
+  "bg-white/5 border-white/10 text-gray-100 shadow-xl";
 
 // Platform icon SVG
 const PlatformIcon = () => (
@@ -122,12 +129,17 @@ const CloseIcon = () => (
   </svg>
 );
 
-const inputClass =
-  "w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors";
+const getInputClass = (isLightMode, hasError = false) =>
+  `w-full rounded-xl px-4 py-3 transition-all duration-300 ${
+    isLightMode 
+      ? `bg-white/50 border ${hasError ? "border-red-300 focus:ring-red-500" : "border-white/30 focus:ring-blue-500"} text-gray-900 placeholder-gray-500 focus:bg-white/70` 
+      : `bg-white/10 border ${hasError ? "border-red-500/50 focus:ring-red-500" : "border-white/20 focus:ring-blue-500"} text-gray-100 placeholder-gray-400 focus:bg-white/20`
+  } focus:outline-none focus:ring-2`;
 
-const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
+const getLabelClass = (isLightMode) =>
+  `block text-sm font-medium ${isLightMode ? "text-gray-900" : "text-gray-100"} mb-2`;
 
-function AddListingModal({ isOpen, onClose, onSave }) {
+function AddListingForm({ onSave, isLightMode = false, onCancel }) {
   const [form, setForm] = useState({
     name: "",
     price: "",
@@ -137,12 +149,35 @@ function AddListingModal({ isOpen, onClose, onSave }) {
     bathrooms: "",
     area: "",
     image: "",
+    imageFile: null,
   });
   const [errors, setErrors] = useState({});
+  const fileInputRef = useRef(null);
 
   const handleChange = (field) => (e) => {
     setForm((prev) => ({ ...prev, [field]: e.target.value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: null }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // 5MB limit
+        setErrors(prev => ({ ...prev, image: "File size must be less than 5MB" }));
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setForm(prev => ({ ...prev, image: event.target.result, imageFile: file }));
+        if (errors.image) setErrors(prev => ({ ...prev, image: null }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current?.click();
   };
 
   const validate = () => {
@@ -167,7 +202,7 @@ function AddListingModal({ isOpen, onClose, onSave }) {
       bedrooms: parseInt(form.bedrooms, 10) || 0,
       bathrooms: parseInt(form.bathrooms, 10) || 0,
       area: parseInt(form.area, 10) || 0,
-      image: form.image.trim() || FALLBACK_IMAGE,
+      image: form.image || FALLBACK_IMAGE,
     };
 
     onSave(listing);
@@ -180,51 +215,37 @@ function AddListingModal({ isOpen, onClose, onSave }) {
       bathrooms: "",
       area: "",
       image: "",
+      imageFile: null,
     });
     setErrors({});
-    onClose();
   };
 
   const handleCancel = () => {
-    setForm({ name: "", price: "", city: "", location: "", bedrooms: "", bathrooms: "", area: "", image: "" });
+    setForm({ name: "", price: "", city: "", location: "", bedrooms: "", bathrooms: "", area: "", image: "", imageFile: null });
     setErrors({});
-    onClose();
+    onCancel();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="add-listing-title"
-    >
-      {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
-        onClick={handleCancel}
-      />
-
-      {/* Modal panel */}
-      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl transform transition-all duration-200">
-        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl">
-          <h2 id="add-listing-title" className="text-xl font-semibold text-gray-900">
-            Add Listing
+    <div className={`w-full ${glassBase} ${isLightMode ? glassLight : glassDark}`}>
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className={`text-xl font-semibold ${isLightMode ? "text-gray-900" : "text-gray-100"}`}>
+            Add New Listing
           </h2>
           <button
             type="button"
             onClick={handleCancel}
-            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className={`p-2 rounded-xl transition-all duration-300 ${isLightMode ? "text-gray-500 hover:text-gray-700 hover:bg-white/20" : "text-gray-400 hover:text-gray-200 hover:bg-white/10"}`}
             aria-label="Close"
           >
             <CloseIcon />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="property-name" className={labelClass}>
+            <label htmlFor="property-name" className={getLabelClass(isLightMode)}>
               Property Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -233,15 +254,15 @@ function AddListingModal({ isOpen, onClose, onSave }) {
               value={form.name}
               onChange={handleChange("name")}
               placeholder="e.g. Modern Villa with Sea View"
-              className={`${inputClass} ${errors.name ? "border-red-500" : ""}`}
+              className={getInputClass(isLightMode, errors.name)}
             />
             {errors.name && (
-              <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+              <p className={`mt-1 text-sm ${isLightMode ? "text-red-600" : "text-red-400"}`}>{errors.name}</p>
             )}
           </div>
 
           <div>
-            <label htmlFor="price" className={labelClass}>
+            <label htmlFor="price" className={getLabelClass(isLightMode)}>
               Price <span className="text-red-500">*</span>
             </label>
             <input
@@ -250,16 +271,16 @@ function AddListingModal({ isOpen, onClose, onSave }) {
               value={form.price}
               onChange={handleChange("price")}
               placeholder="e.g. AED 2,450,000"
-              className={`${inputClass} ${errors.price ? "border-red-500" : ""}`}
+              className={getInputClass(isLightMode, errors.price)}
             />
             {errors.price && (
-              <p className="mt-1 text-sm text-red-500">{errors.price}</p>
+              <p className={`mt-1 text-sm ${isLightMode ? "text-red-600" : "text-red-400"}`}>{errors.price}</p>
             )}
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="city" className={labelClass}>
+              <label htmlFor="city" className={getLabelClass(isLightMode)}>
                 City <span className="text-red-500">*</span>
               </label>
               <input
@@ -268,14 +289,14 @@ function AddListingModal({ isOpen, onClose, onSave }) {
                 value={form.city}
                 onChange={handleChange("city")}
                 placeholder="e.g. Dubai"
-                className={`${inputClass} ${errors.city ? "border-red-500" : ""}`}
+                className={getInputClass(isLightMode, errors.city)}
               />
               {errors.city && (
-                <p className="mt-1 text-sm text-red-500">{errors.city}</p>
+                <p className={`mt-1 text-sm ${isLightMode ? "text-red-600" : "text-red-400"}`}>{errors.city}</p>
               )}
             </div>
             <div>
-              <label htmlFor="location" className={labelClass}>
+              <label htmlFor="location" className={getLabelClass(isLightMode)}>
                 Location
               </label>
               <input
@@ -284,14 +305,14 @@ function AddListingModal({ isOpen, onClose, onSave }) {
                 value={form.location}
                 onChange={handleChange("location")}
                 placeholder="e.g. UAE or Palm Jumeirah"
-                className={inputClass}
+                className={getInputClass(isLightMode)}
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
-              <label htmlFor="bedrooms" className={labelClass}>
+              <label htmlFor="bedrooms" className={getLabelClass(isLightMode)}>
                 Bedrooms
               </label>
               <input
@@ -301,11 +322,11 @@ function AddListingModal({ isOpen, onClose, onSave }) {
                 value={form.bedrooms}
                 onChange={handleChange("bedrooms")}
                 placeholder="0"
-                className={inputClass}
+                className={getInputClass(isLightMode)}
               />
             </div>
             <div>
-              <label htmlFor="bathrooms" className={labelClass}>
+              <label htmlFor="bathrooms" className={getLabelClass(isLightMode)}>
                 Bathrooms
               </label>
               <input
@@ -315,11 +336,11 @@ function AddListingModal({ isOpen, onClose, onSave }) {
                 value={form.bathrooms}
                 onChange={handleChange("bathrooms")}
                 placeholder="0"
-                className={inputClass}
+                className={getInputClass(isLightMode)}
               />
             </div>
             <div>
-              <label htmlFor="area" className={labelClass}>
+              <label htmlFor="area" className={getLabelClass(isLightMode)}>
                 Area (sqft)
               </label>
               <input
@@ -329,36 +350,48 @@ function AddListingModal({ isOpen, onClose, onSave }) {
                 value={form.area}
                 onChange={handleChange("area")}
                 placeholder="0"
-                className={inputClass}
+                className={getInputClass(isLightMode)}
               />
             </div>
           </div>
 
           <div>
-            <label htmlFor="image-url" className={labelClass}>
-              Image URL
+            <label className={getLabelClass(isLightMode)}>
+              Property Image
             </label>
+            <div 
+              className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer ${isLightMode ? "border-gray-300 hover:border-blue-500" : "border-gray-600 hover:border-blue-400"}`}
+              onClick={triggerFileInput}
+            >
+              {form.image ? (
+                <img src={form.image} alt="Preview" className="max-h-40 mx-auto rounded-lg" />
+              ) : (
+                <p className={isLightMode ? "text-gray-500" : "text-gray-400"}>Click to upload image</p>
+              )}
+            </div>
             <input
-              id="image-url"
-              type="url"
-              value={form.image}
-              onChange={handleChange("image")}
-              placeholder="https://example.com/image.jpg"
-              className={inputClass}
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="hidden"
             />
+            {errors.image && (
+              <p className={isLightMode ? "text-red-600" : "text-red-400"}>{errors.image}</p>
+            )}
           </div>
 
           <div className="flex gap-3 pt-4">
             <button
               type="button"
               onClick={handleCancel}
-              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+              className={`flex-1 px-4 py-3 rounded-xl font-medium ${isLightMode ? "bg-white/20 text-gray-700 hover:bg-white/30" : "bg-white/10 text-gray-200 hover:bg-white/20"}`}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2.5 rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-500 transition-colors"
+              className={`flex-1 px-4 py-3 rounded-xl font-medium ${isLightMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-500"}`}
             >
               Save Listing
             </button>
@@ -369,13 +402,13 @@ function AddListingModal({ isOpen, onClose, onSave }) {
   );
 }
 
-function ListingCard({ listing }) {
+function ListingCard({ listing, isLightMode = false }) {
   const [isFavorite, setIsFavorite] = useState(false);
   const imageSrc = listing.image || FALLBACK_IMAGE;
 
   return (
-    <article className="group bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      <div className="relative aspect-video overflow-hidden rounded-t-xl">
+    <article className={`group rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 ${glassBase} ${isLightMode ? glassLight : glassDark}`}>
+      <div className="relative aspect-video overflow-hidden rounded-t-2xl">
         <img
           src={imageSrc}
           alt={listing.name}
@@ -386,34 +419,34 @@ function ListingCard({ listing }) {
         />
       </div>
 
-      <div className="p-4">
-        <h3 className="font-semibold text-gray-900 text-lg truncate">
+      <div className="p-5">
+        <h3 className={`font-semibold text-lg truncate ${isLightMode ? "text-gray-900" : "text-gray-100"}`}>
           {listing.name}
         </h3>
-        <p className="text-teal-600 font-bold text-xl mt-1">{listing.price}</p>
-        <p className="text-gray-500 text-sm mt-0.5">
+        <p className={`font-bold text-xl mt-1 ${isLightMode ? "text-blue-600" : "text-blue-400"}`}>{listing.price}</p>
+        <p className={`text-sm mt-1 ${isLightMode ? "text-gray-600" : "text-gray-400"}`}>
           {listing.city}
           {listing.location && `, ${listing.location}`}
         </p>
 
-        <div className="flex gap-4 mt-3 text-gray-400 text-sm">
+        <div className={`flex gap-4 mt-3 text-sm ${isLightMode ? "text-gray-500" : "text-gray-400"}`}>
           <span>{listing.bedrooms} Beds</span>
           <span>{listing.bathrooms} Baths</span>
           <span>{listing.area ? `${listing.area.toLocaleString()} sqft` : "—"}</span>
         </div>
 
-        <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
-          <button type="button" className="p-1 cursor-pointer">
+        <div className={`flex items-center gap-3 mt-4 pt-3 ${isLightMode ? "border-t border-gray-200" : "border-t border-gray-700"}`}>
+          <button type="button" className={`p-1 cursor-pointer ${isLightMode ? "text-gray-500 hover:text-blue-600" : "text-gray-400 hover:text-blue-400"} transition-colors`}>
             <MessageIcon />
           </button>
           <button
             type="button"
-            className="p-1 cursor-pointer"
+            className={`p-1 cursor-pointer transition-colors ${isLightMode ? "text-gray-500 hover:text-red-500" : "text-gray-400 hover:text-red-400"}`}
             onClick={() => setIsFavorite(!isFavorite)}
           >
             <HeartIcon filled={isFavorite} />
           </button>
-          <button type="button" className="p-1 cursor-pointer">
+          <button type="button" className={`p-1 cursor-pointer ${isLightMode ? "text-gray-500 hover:text-blue-600" : "text-gray-400 hover:text-blue-400"} transition-colors`}>
             <ShareIcon />
           </button>
         </div>
@@ -422,14 +455,19 @@ function ListingCard({ listing }) {
   );
 }
 
-export default function Listing() {
+export default function Listing({ isLightMode = false }) {
   const [listings, setListings] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("newest");
 
   const handleSaveListing = (listing) => {
     setListings((prev) => [listing, ...prev]);
+    setIsAdding(false);
+  };
+
+  const handleCancelAdd = () => {
+    setIsAdding(false);
   };
 
   const sortedListings = [...listings].sort((a, b) => {
@@ -443,16 +481,16 @@ export default function Listing() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen transition-all duration-500 ${isLightMode ? "bg-gradient-to-br from-rose-200 via-purple-200 to-blue-200" : "bg-gradient-to-br from-slate-900 via-indigo-900 to-purple-900"}`}>
       {/* Top Info Banner */}
-      <div className="bg-teal-800 rounded-xl shadow-lg mx-4 mt-4 md:mx-6 md:mt-6 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div className={`rounded-2xl shadow-lg mx-4 mt-4 md:mx-6 md:mt-6 p-6 ${glassBase} ${isLightMode ? glassLight : glassDark} flex flex-col md:flex-row md:items-center md:justify-between gap-6`}>
         <div className="flex items-start gap-4">
           <PlatformIcon />
           <div>
-            <h2 className="text-white font-semibold text-lg">
+            <h2 className={`font-semibold text-lg ${isLightMode ? "text-gray-900" : "text-gray-100"}`}>
               One Platform, Multiple Portals.
             </h2>
-            <p className="text-teal-200 text-sm mt-1">
+            <p className={`text-sm mt-1 ${isLightMode ? "text-gray-600" : "text-gray-400"}`}>
               Sync effortlessly with Bayut, Dubizzle, and Property Finder in a few simple steps.
             </p>
           </div>
@@ -460,13 +498,13 @@ export default function Listing() {
         <div className="flex items-center gap-3 flex-shrink-0">
           <button
             type="button"
-            className="text-teal-200 hover:text-white font-medium text-sm transition-colors"
+            className={`font-medium text-sm transition-colors ${isLightMode ? "text-gray-600 hover:text-gray-900" : "text-gray-400 hover:text-gray-200"}`}
           >
             Dismiss
           </button>
           <button
             type="button"
-            className="bg-teal-600 hover:bg-teal-500 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
+            className={`font-medium px-5 py-2.5 rounded-xl transition-colors ${isLightMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-500"}`}
           >
             Setup Automatic Sync
           </button>
@@ -475,27 +513,29 @@ export default function Listing() {
 
       {/* Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-8 mx-4 md:mx-6">
-        <h1 className="text-2xl font-bold text-gray-900">All Listings</h1>
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          className="bg-teal-600 hover:bg-teal-500 text-white font-medium px-5 py-2.5 rounded-lg transition-colors w-fit"
-        >
-          Add Listing
-        </button>
+        <h1 className={`text-2xl font-bold ${isLightMode ? "text-gray-900" : "text-gray-100"}`}>All Listings</h1>
+        {!isAdding && (
+          <button
+            type="button"
+            onClick={() => setIsAdding(true)}
+            className={`font-medium px-5 py-2.5 rounded-xl transition-colors w-fit ${isLightMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-500"}`}
+          >
+            Add Listing
+          </button>
+        )}
       </div>
 
       {/* Filter + View Controls */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 mx-4 md:mx-6">
+      <div className={`flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 mx-4 md:mx-6 ${glassBase} ${isLightMode ? glassLight : glassDark} p-4 rounded-xl`}>
         <div className="flex items-center gap-2">
-          <label htmlFor="sort-select" className="text-gray-600 text-sm font-medium">
+          <label htmlFor="sort-select" className={`text-sm font-medium ${isLightMode ? "text-gray-700" : "text-gray-300"}`}>
             Sort by
           </label>
           <select
             id="sort-select"
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value)}
-            className="border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-700 bg-white focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+            className={`rounded-xl px-4 py-2 text-sm ${isLightMode ? "bg-white/50 border border-white/30 text-gray-900 focus:ring-blue-500" : "bg-white/10 border border-white/20 text-gray-100 focus:ring-blue-500"} focus:outline-none focus:ring-2`}
           >
             <option value="newest">Newest</option>
             <option value="price-asc">Price: Low to High</option>
@@ -507,19 +547,26 @@ export default function Listing() {
           <button
             type="button"
             onClick={() => setViewMode("grid")}
-            className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+            className={`p-2 rounded-xl transition-colors ${isLightMode ? "hover:bg-white/20" : "hover:bg-white/10"}`}
           >
             <GridViewIcon active={viewMode === "grid"} />
           </button>
           <button
             type="button"
             onClick={() => setViewMode("list")}
-            className="p-2 rounded-lg hover:bg-gray-200 transition-colors"
+            className={`p-2 rounded-xl transition-colors ${isLightMode ? "hover:bg-white/20" : "hover:bg-white/10"}`}
           >
             <ListViewIcon active={viewMode === "list"} />
           </button>
         </div>
       </div>
+
+      {/* Add Listing Form */}
+      {isAdding && (
+        <div className="mx-4 md:mx-6 mt-6">
+          <AddListingForm onSave={handleSaveListing} isLightMode={isLightMode} onCancel={handleCancelAdd} />
+        </div>
+      )}
 
       {/* Listings Grid or Empty State */}
       <div
@@ -529,31 +576,26 @@ export default function Listing() {
             : "flex flex-col gap-4"
         }`}
       >
-        {listings.length === 0 ? (
-          <div className="col-span-full flex flex-col items-center justify-center py-16 px-6 rounded-xl bg-white shadow-sm border border-gray-100">
-            <p className="text-gray-500 text-center text-lg">
+        {listings.length === 0 && !isAdding ? (
+          <div className={`col-span-full flex flex-col items-center justify-center py-16 px-6 rounded-2xl ${glassBase} ${isLightMode ? glassLight : glassDark}`}>
+            <p className={`text-center text-lg ${isLightMode ? "text-gray-600" : "text-gray-400"}`}>
               No listings yet. Click &quot;Add Listing&quot; to create your first property.
             </p>
             <button
               type="button"
-              onClick={() => setIsModalOpen(true)}
-              className="mt-4 bg-teal-600 hover:bg-teal-500 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
+              onClick={() => setIsAdding(true)}
+              className={`mt-4 font-medium px-5 py-2.5 rounded-xl transition-colors ${isLightMode ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-blue-600 text-white hover:bg-blue-500"}`}
             >
               Add Listing
             </button>
           </div>
         ) : (
           sortedListings.map((listing) => (
-            <ListingCard key={listing.id} listing={listing} />
+            <ListingCard key={listing.id} listing={listing} isLightMode={isLightMode} />
           ))
         )}
       </div>
 
-      <AddListingModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveListing}
-      />
     </div>
   );
 }
