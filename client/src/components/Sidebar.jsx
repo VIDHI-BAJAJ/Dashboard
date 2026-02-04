@@ -58,8 +58,7 @@ export default function Sidebar({
     { id: "dashboard", label: "Dashboard", icon: <IconBolt /> },
     { id: "leads", label: "Leads", icon: <IconUsers /> },
     { id: "conversations", label: "Conversations", icon: <IconChat /> },
-    { id: "tasks", label: "Tasks", icon: <IconCheck /> },
-    { id: "deals", label: "Deals", icon: <IconSpark /> }
+    { id: 'listing', label: 'Listing', icon: <IconCheck /> },
   ];
 
   return (
@@ -136,22 +135,6 @@ export default function Sidebar({
                 </button>
               ))}
             </nav>
-
-            <div className="p-3 space-y-2">
-              <button
-                onClick={() => fetchAll({ isRefresh: true })}
-                disabled={loading || refreshing}
-                className="h-10 w-10 mx-auto rounded-2xl liquid-glass liquid-hover flex items-center justify-center"
-              >
-                <IconRefresh className={loading || refreshing ? "animate-spin" : ""} />
-              </button>
-
-              {isExpanded && (
-                <div className="text-xs text-center opacity-80">
-                  {updatedAgoLabel}
-                </div>
-              )}
-            </div>
           </div>
         </aside>
       )}

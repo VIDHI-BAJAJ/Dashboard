@@ -9,7 +9,7 @@ export default function Sidebar({ updatedAgoLabel, loading, refreshing, fetchAll
     { id: 'leads', label: 'Leads', icon: <IconUsers /> },
     { id: 'conversations', label: 'Conversations', icon: <IconChat /> },
     { id: 'tasks', label: 'Tasks', icon: <IconCheck /> },
-    { id: 'deals', label: 'Deals', icon: <IconSpark /> },
+    { id: 'listing', label: 'Listing', icon: <IconSpark/> },
   ];
 
   return (
