@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=338&fit=crop";
+
 // Platform icon SVG
 const PlatformIcon = () => (
   <svg
@@ -102,104 +105,303 @@ const ShareIcon = () => (
   </svg>
 );
 
-const MOCK_LISTINGS = [
-  {
-    id: 1,
-    name: "Modern Villa with Sea View",
-    price: "AED 2,450,000",
-    city: "Dubai",
-    country: "UAE",
-    bedrooms: 4,
-    bathrooms: 5,
-    area: 3200,
-    image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=600&h=338&fit=crop",
-  },
-  {
-    id: 2,
-    name: "Luxury Apartment in Downtown",
-    price: "AED 1,890,000",
-    city: "Dubai",
-    country: "UAE",
-    bedrooms: 3,
-    bathrooms: 3,
-    area: 1850,
-    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=600&h=338&fit=crop",
-  },
-  {
-    id: 3,
-    name: "Spacious Family Home",
-    price: "AED 3,200,000",
-    city: "Abu Dhabi",
-    country: "UAE",
-    bedrooms: 5,
-    bathrooms: 6,
-    area: 4200,
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&h=338&fit=crop",
-  },
-  {
-    id: 4,
-    name: "Contemporary Penthouse",
-    price: "AED 4,500,000",
-    city: "Dubai",
-    country: "UAE",
-    bedrooms: 4,
-    bathrooms: 4,
-    area: 2800,
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&h=338&fit=crop",
-  },
-  {
-    id: 5,
-    name: "Beachfront Apartment",
-    price: "AED 1,650,000",
-    city: "Dubai",
-    country: "UAE",
-    bedrooms: 2,
-    bathrooms: 2,
-    area: 1200,
-    image: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=600&h=338&fit=crop",
-  },
-  {
-    id: 6,
-    name: "Garden Villa",
-    price: "AED 2,800,000",
-    city: "Sharjah",
-    country: "UAE",
-    bedrooms: 4,
-    bathrooms: 4,
-    area: 3500,
-    image: "https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&h=338&fit=crop",
-  },
-];
+// Close icon for modal
+const CloseIcon = () => (
+  <svg
+    className="h-5 w-5"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M6 18L18 6M6 6l12 12"
+    />
+  </svg>
+);
+
+const inputClass =
+  "w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-teal-500 focus:border-teal-500 transition-colors";
+
+const labelClass = "block text-sm font-medium text-gray-700 mb-1.5";
+
+function AddListingModal({ isOpen, onClose, onSave }) {
+  const [form, setForm] = useState({
+    name: "",
+    price: "",
+    city: "",
+    location: "",
+    bedrooms: "",
+    bathrooms: "",
+    area: "",
+    image: "",
+  });
+  const [errors, setErrors] = useState({});
+
+  const handleChange = (field) => (e) => {
+    setForm((prev) => ({ ...prev, [field]: e.target.value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: null }));
+  };
+
+  const validate = () => {
+    const err = {};
+    if (!form.name.trim()) err.name = "Property name is required";
+    if (!form.price.trim()) err.price = "Price is required";
+    if (!form.city.trim()) err.city = "City is required";
+    setErrors(err);
+    return Object.keys(err).length === 0;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!validate()) return;
+
+    const listing = {
+      id: Date.now(),
+      name: form.name.trim(),
+      price: form.price.trim(),
+      city: form.city.trim(),
+      location: form.location.trim() || form.city.trim(),
+      bedrooms: parseInt(form.bedrooms, 10) || 0,
+      bathrooms: parseInt(form.bathrooms, 10) || 0,
+      area: parseInt(form.area, 10) || 0,
+      image: form.image.trim() || FALLBACK_IMAGE,
+    };
+
+    onSave(listing);
+    setForm({
+      name: "",
+      price: "",
+      city: "",
+      location: "",
+      bedrooms: "",
+      bathrooms: "",
+      area: "",
+      image: "",
+    });
+    setErrors({});
+    onClose();
+  };
+
+  const handleCancel = () => {
+    setForm({ name: "", price: "", city: "", location: "", bedrooms: "", bathrooms: "", area: "", image: "" });
+    setErrors({});
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-listing-title"
+    >
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity"
+        onClick={handleCancel}
+      />
+
+      {/* Modal panel */}
+      <div className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto bg-white rounded-xl shadow-2xl transform transition-all duration-200">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between rounded-t-xl">
+          <h2 id="add-listing-title" className="text-xl font-semibold text-gray-900">
+            Add Listing
+          </h2>
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            aria-label="Close"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label htmlFor="property-name" className={labelClass}>
+              Property Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="property-name"
+              type="text"
+              value={form.name}
+              onChange={handleChange("name")}
+              placeholder="e.g. Modern Villa with Sea View"
+              className={`${inputClass} ${errors.name ? "border-red-500" : ""}`}
+            />
+            {errors.name && (
+              <p className="mt-1 text-sm text-red-500">{errors.name}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="price" className={labelClass}>
+              Price <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="price"
+              type="text"
+              value={form.price}
+              onChange={handleChange("price")}
+              placeholder="e.g. AED 2,450,000"
+              className={`${inputClass} ${errors.price ? "border-red-500" : ""}`}
+            />
+            {errors.price && (
+              <p className="mt-1 text-sm text-red-500">{errors.price}</p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="city" className={labelClass}>
+                City <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="city"
+                type="text"
+                value={form.city}
+                onChange={handleChange("city")}
+                placeholder="e.g. Dubai"
+                className={`${inputClass} ${errors.city ? "border-red-500" : ""}`}
+              />
+              {errors.city && (
+                <p className="mt-1 text-sm text-red-500">{errors.city}</p>
+              )}
+            </div>
+            <div>
+              <label htmlFor="location" className={labelClass}>
+                Location
+              </label>
+              <input
+                id="location"
+                type="text"
+                value={form.location}
+                onChange={handleChange("location")}
+                placeholder="e.g. UAE or Palm Jumeirah"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label htmlFor="bedrooms" className={labelClass}>
+                Bedrooms
+              </label>
+              <input
+                id="bedrooms"
+                type="number"
+                min="0"
+                value={form.bedrooms}
+                onChange={handleChange("bedrooms")}
+                placeholder="0"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label htmlFor="bathrooms" className={labelClass}>
+                Bathrooms
+              </label>
+              <input
+                id="bathrooms"
+                type="number"
+                min="0"
+                value={form.bathrooms}
+                onChange={handleChange("bathrooms")}
+                placeholder="0"
+                className={inputClass}
+              />
+            </div>
+            <div>
+              <label htmlFor="area" className={labelClass}>
+                Area (sqft)
+              </label>
+              <input
+                id="area"
+                type="number"
+                min="0"
+                value={form.area}
+                onChange={handleChange("area")}
+                placeholder="0"
+                className={inputClass}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="image-url" className={labelClass}>
+              Image URL
+            </label>
+            <input
+              id="image-url"
+              type="url"
+              value={form.image}
+              onChange={handleChange("image")}
+              placeholder="https://example.com/image.jpg"
+              className={inputClass}
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-2.5 rounded-lg bg-teal-600 text-white font-medium hover:bg-teal-500 transition-colors"
+            >
+              Save Listing
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 function ListingCard({ listing }) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const imageSrc = listing.image || FALLBACK_IMAGE;
 
   return (
     <article className="group bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      {/* Image container - 16:9 aspect ratio */}
       <div className="relative aspect-video overflow-hidden rounded-t-xl">
         <img
-          src={listing.image}
+          src={imageSrc}
           alt={listing.name}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          onError={(e) => {
+            e.target.src = FALLBACK_IMAGE;
+          }}
         />
       </div>
 
       <div className="p-4">
-        <h3 className="font-semibold text-gray-900 text-lg truncate">{listing.name}</h3>
+        <h3 className="font-semibold text-gray-900 text-lg truncate">
+          {listing.name}
+        </h3>
         <p className="text-teal-600 font-bold text-xl mt-1">{listing.price}</p>
         <p className="text-gray-500 text-sm mt-0.5">
-          {listing.city}, {listing.country}
+          {listing.city}
+          {listing.location && `, ${listing.location}`}
         </p>
 
-        {/* Metadata row */}
         <div className="flex gap-4 mt-3 text-gray-400 text-sm">
           <span>{listing.bedrooms} Beds</span>
           <span>{listing.bathrooms} Baths</span>
-          <span>{listing.area.toLocaleString()} sqft</span>
+          <span>{listing.area ? `${listing.area.toLocaleString()} sqft` : "—"}</span>
         </div>
 
-        {/* Bottom icon row */}
         <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-100">
           <button type="button" className="p-1 cursor-pointer">
             <MessageIcon />
@@ -221,12 +423,28 @@ function ListingCard({ listing }) {
 }
 
 export default function Listing() {
+  const [listings, setListings] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("newest");
 
+  const handleSaveListing = (listing) => {
+    setListings((prev) => [listing, ...prev]);
+  };
+
+  const sortedListings = [...listings].sort((a, b) => {
+    if (sortBy === "newest") return (b.id || 0) - (a.id || 0);
+    if (sortBy === "oldest") return (a.id || 0) - (b.id || 0);
+    const priceA = parseFloat(String(a.price).replace(/[^0-9.]/g, "")) || 0;
+    const priceB = parseFloat(String(b.price).replace(/[^0-9.]/g, "")) || 0;
+    if (sortBy === "price-asc") return priceA - priceB;
+    if (sortBy === "price-desc") return priceB - priceA;
+    return 0;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 1. Top Info Banner */}
+      {/* Top Info Banner */}
       <div className="bg-teal-800 rounded-xl shadow-lg mx-4 mt-4 md:mx-6 md:mt-6 p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div className="flex items-start gap-4">
           <PlatformIcon />
@@ -255,18 +473,19 @@ export default function Listing() {
         </div>
       </div>
 
-      {/* 2. Header Row */}
+      {/* Header Row */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-8 mx-4 md:mx-6">
         <h1 className="text-2xl font-bold text-gray-900">All Listings</h1>
         <button
           type="button"
+          onClick={() => setIsModalOpen(true)}
           className="bg-teal-600 hover:bg-teal-500 text-white font-medium px-5 py-2.5 rounded-lg transition-colors w-fit"
         >
           Add Listing
         </button>
       </div>
 
-      {/* 3. Filter + View Controls */}
+      {/* Filter + View Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-6 mx-4 md:mx-6">
         <div className="flex items-center gap-2">
           <label htmlFor="sort-select" className="text-gray-600 text-sm font-medium">
@@ -302,7 +521,7 @@ export default function Listing() {
         </div>
       </div>
 
-      {/* 4. Listings Grid */}
+      {/* Listings Grid or Empty State */}
       <div
         className={`mx-4 md:mx-6 mt-6 pb-12 ${
           viewMode === "grid"
@@ -310,10 +529,31 @@ export default function Listing() {
             : "flex flex-col gap-4"
         }`}
       >
-        {MOCK_LISTINGS.map((listing) => (
-          <ListingCard key={listing.id} listing={listing} />
-        ))}
+        {listings.length === 0 ? (
+          <div className="col-span-full flex flex-col items-center justify-center py-16 px-6 rounded-xl bg-white shadow-sm border border-gray-100">
+            <p className="text-gray-500 text-center text-lg">
+              No listings yet. Click &quot;Add Listing&quot; to create your first property.
+            </p>
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              className="mt-4 bg-teal-600 hover:bg-teal-500 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
+            >
+              Add Listing
+            </button>
+          </div>
+        ) : (
+          sortedListings.map((listing) => (
+            <ListingCard key={listing.id} listing={listing} />
+          ))
+        )}
       </div>
+
+      <AddListingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={handleSaveListing}
+      />
     </div>
   );
 }
