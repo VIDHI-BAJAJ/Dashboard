@@ -58,7 +58,7 @@ export default function Sidebar({
     { id: "dashboard", label: "Dashboard", icon: <IconBolt /> },
     { id: "leads", label: "Leads", icon: <IconUsers /> },
     { id: "conversations", label: "Conversations", icon: <IconChat /> },
-    { id: 'deal', label: 'Deal', icon: <IconSpark /> },
+    { id: 'tasks', label: 'Tasks', icon: <IconSpark /> },
     { id: 'listing', label: 'Listing', icon: <IconCheck /> },
   ];
 
