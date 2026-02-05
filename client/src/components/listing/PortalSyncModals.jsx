@@ -254,7 +254,7 @@ export function IntegrationStep2Modal({
   };
 
   const emailTemplate = connectionInfo
-    ? `To: support@magicbricks.com
+    ? `To: enquiry@magicbricks.com
 Cc: support@aievoveked.com
 Subject: Request to activate XML feed for my broker account
 
