@@ -9,6 +9,7 @@ import TasksPage from "./TasksPage";
 import DealsPage from "./DealsPage";
 import LeadDetails from "./LeadDetails";
 import LeadForm from "./LeadForm";
+import Listing from "./Listing";
 import { GlassTooltip } from "./UIComponents";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
@@ -479,6 +480,8 @@ export default function Dashboard() {
               refreshing={refreshing}
               fetchAll={fetchAll}
             />
+          ) : activePage === "listing" ? (
+            <Listing isLightMode={isLightMode} />
           ) : null}
         </main>
         
