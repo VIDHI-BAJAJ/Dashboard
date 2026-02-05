@@ -206,10 +206,58 @@ app.get("/api/conversations", async (req, res) => {
   }
 });
 
+/* ===================== LISTINGS (MOCK) ===================== */
+/* In production, replace with Airtable or DB persistence */
+const listingsStore = [];
+
+app.get("/api/listings", (req, res) => {
+  try {
+    res.json(listingsStore);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch listings" });
+  }
+});
+
+app.post("/api/listings", (req, res) => {
+  try {
+    const listing = req.body;
+    if (!listing) return res.status(400).json({ error: "Listing required" });
+    const id = listing.id || Date.now();
+    const record = { ...listing, id };
+    listingsStore.push(record);
+    res.status(201).json(record);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create listing" });
+  }
+});
+
+/* ===================== PORTAL CONNECT (MOCK) ===================== */
+/* Kendal-AI style Magicbricks portal sync — mock endpoint */
+app.post("/api/portal/magicbricks/connect", (req, res) => {
+  try {
+    const { accountEmail, eligibleListingIds } = req.body;
+    if (!accountEmail) {
+      return res.status(400).json({ error: "accountEmail is required" });
+    }
+    const result = {
+      portal: "magicbricks",
+      status: "PENDING_VERIFICATION",
+      accountEmail,
+      eligibleListingIds: eligibleListingIds || [],
+    };
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to connect portal" });
+  }
+});
+
 /* ===================== START SERVER ===================== */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`POST  /api/leads`);
   console.log(`GET   /api/leads`);
   console.log(`GET   /api/revenue-stats`);
+  console.log(`GET   /api/listings`);
+  console.log(`POST  /api/listings`);
+  console.log(`POST  /api/portal/magicbricks/connect`);
 });
