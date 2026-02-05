@@ -29,6 +29,8 @@ app.get("/", (req, res) => {
   res.send("Backend is live 🚀");
 });
 
+app.use('/api/portals/magicbricks', magicbricksRouter);
+
 /* ===================== AIRTABLE FETCH (GENERIC) ===================== */
 const fetchTable = async (tableName) => {
   let records = [];
