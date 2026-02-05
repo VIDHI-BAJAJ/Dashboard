@@ -210,8 +210,8 @@ app.get("/api/conversations", async (req, res) => {
 /* In production, replace with Airtable or DB persistence */
 const listingsStore = [];
 
-// In-memory Magicbricks portal connection + listing maps (per broker)
-// In production, move this to a proper database keyed by broker/company.
+// In-memory portal connection + listing maps (per broker)
+// In a real app, these would live in a proper database with broker auth
 const portalConnections = new Map(); // brokerId -> { portal, status, brokerId, xmlFeedUrl, listingIds }
 const portalListingMap = new Map(); // brokerId -> [listing]
 
@@ -236,9 +236,9 @@ app.post("/api/listings", (req, res) => {
   }
 });
 
-/* ===================== MAGICBRICKS XML FEED WORKFLOW ===================== */
+/* ===================== MAGICBRICKS PORTAL INTEGRATION ===================== */
 
-// Simple XML escape helper for text nodes/attributes
+// Helper: basic XML escaping for text nodes
 const xmlEscape = (value) =>
   String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -247,7 +247,7 @@ const xmlEscape = (value) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 
-// Build a basic Magicbricks-style XML feed for a broker
+// Helper: build a simple Magicbricks-style XML feed for a broker
 const buildMagicbricksXml = (brokerId, listings) => {
   const generatedAt = new Date().toISOString();
 
@@ -380,26 +380,6 @@ app.get("/feeds/magicbricks/:brokerId.xml", (req, res) => {
   }
 });
 
-/* ===================== PORTAL CONNECT (MOCK) ===================== */
-/* Kendal-AI style Magicbricks portal sync — mock endpoint */
-app.post("/api/portal/magicbricks/connect", (req, res) => {
-  try {
-    const { accountEmail, eligibleListingIds } = req.body;
-    if (!accountEmail) {
-      return res.status(400).json({ error: "accountEmail is required" });
-    }
-    const result = {
-      portal: "magicbricks",
-      status: "PENDING_VERIFICATION",
-      accountEmail,
-      eligibleListingIds: eligibleListingIds || [],
-    };
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to connect portal" });
-  }
-});
-
 /* ===================== START SERVER ===================== */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
@@ -410,5 +390,4 @@ app.listen(PORT, () => {
   console.log(`POST  /api/listings`);
   console.log(`POST  /api/portal/magicbricks/initiate`);
   console.log(`GET   /feeds/magicbricks/:brokerId.xml`);
-  console.log(`POST  /api/portal/magicbricks/connect`);
 });

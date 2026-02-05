@@ -255,6 +255,7 @@ export function IntegrationStep2Modal({
 
   const emailTemplate = connectionInfo
     ? `To: support@magicbricks.com
+Cc: support@aievoveked.com
 Subject: Request to activate XML feed for my broker account
 
 Dear Magicbricks Team,
@@ -375,10 +376,9 @@ Regards,
               />
             </div>
 
-            <p className={`text-xs ${isLightMode ? "text-gray-500" : "text-gray-400"}`}>
-              Send this email to Magicbricks from your broker account email. Once you&apos;ve
-              requested activation, confirm below.
-            </p>
+              <p className={`text-xs ${isLightMode ? "text-gray-500" : "text-gray-400"}`}>
+                Copy this draft into your email client, send it to Magicbricks with our support in CC, then confirm below.
+              </p>
           </div>
         )}
 
