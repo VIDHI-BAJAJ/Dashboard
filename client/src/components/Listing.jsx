@@ -1,13 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import AllListingsPage from "./listing/AllListingsPage";
 import AddListingPage from "./listing/AddListingPage";
-import {
-  ManagePortalsModal,
-  ProjectRequiredModal,
-  IntegrationStep1Modal,
-  IntegrationStep2Modal,
-  IntegrationStep3Modal,
-} from "./listing/PortalSyncModals";
+import { QuikrPublishModal } from "./listing/PortalSyncModals";
 
 export default function Listing({ isLightMode = false }) {
   const [listings, setListings] = useState([]);
@@ -15,11 +9,31 @@ export default function Listing({ isLightMode = false }) {
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("newest");
 
-  // Portal sync flow state
-  const [portalModal, setPortalModal] = useState(null);
-  const [portalConnection, setPortalConnection] = useState(null);
+  // Quikr publish modal state
+  const [quikrModalListing, setQuikrModalListing] = useState(null);
+
+  // Ref for scrolling to listings when "Setup Automatic Sync" is clicked
+  const listingsSectionRef = useRef(null);
+
+  // Load listings from backend on mount
+  useEffect(() => {
+    const fetchListings = async () => {
+      try {
+        const response = await fetch('/api/listings');
+        if (response.ok) {
+          const data = await response.json();
+          setListings(data);
+        }
+      } catch (error) {
+        console.error('Error fetching listings:', error);
+      }
+    };
+    
+    fetchListings();
+  }, []);
 
   const handleSaveListing = (listing) => {
+    // Add new listing to the beginning of the list
     setListings((prev) => [listing, ...prev]);
     setCurrentPage("list");
   };
@@ -29,24 +43,44 @@ export default function Listing({ isLightMode = false }) {
   };
 
   const handleSetupSync = () => {
-    setPortalModal("manage");
+    // Scroll to listings so user can use "Publish to Quikr" on each card
+    listingsSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const handleActivateMagicbricks = () => {
-    const eligibleListings = listings.filter((l) => l.projectId != null);
-    if (eligibleListings.length > 0) {
-      setPortalModal("step1");
-    } else {
-      setPortalModal("projectRequired");
+  const handlePublishToQuikr = (listing) => {
+    setQuikrModalListing(listing);
+  };
+
+  const handleQuikrPublishSuccess = (data) => {
+    // Update listing status to SYNCING
+    if (quikrModalListing) {
+      setListings((prev) =>
+        prev.map((l) =>
+          l._id === quikrModalListing._id || l.id === quikrModalListing.id
+            ? { ...l, quikr: { ...l.quikr, status: "syncing" } }
+            : l
+        )
+      );
     }
+    setQuikrModalListing(null);
   };
 
-  const handleAttachProject = () => {
-    setPortalModal(null);
-    setCurrentPage("add");
-  };
+  // Poll for listing status updates
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch('/api/listings');
+        if (response.ok) {
+          const data = await response.json();
+          setListings(data);
+        }
+      } catch (error) {
+        console.error('Error fetching updated listings:', error);
+      }
+    }, 10000); // Poll every 10 seconds
 
-  const eligibleListings = listings.filter((l) => l.projectId != null);
+    return () => clearInterval(interval);
+  }, []);
 
   const sortedListings = [...listings].sort((a, b) => {
     if (sortBy === "newest") return (b.id || 0) - (a.id || 0);
@@ -62,6 +96,7 @@ export default function Listing({ isLightMode = false }) {
     <div>
       {currentPage === "list" ? (
         <AllListingsPage
+          ref={listingsSectionRef}
           listings={listings}
           sortedListings={sortedListings}
           viewMode={viewMode}
@@ -70,8 +105,7 @@ export default function Listing({ isLightMode = false }) {
           setSortBy={setSortBy}
           onNavigateToAdd={() => setCurrentPage("add")}
           onSetupSync={handleSetupSync}
-          showPublish={portalConnection?.portal === "magicbricks"}
-          onPublish={handleSetupSync}
+          onPublishToQuikr={handlePublishToQuikr}
           isLightMode={isLightMode}
         />
       ) : (
@@ -83,48 +117,12 @@ export default function Listing({ isLightMode = false }) {
         />
       )}
 
-      {/* Portal Sync Modals */}
-      {portalModal === "manage" && (
-        <ManagePortalsModal
-          onClose={() => setPortalModal(null)}
-          onActivateMagicbricks={handleActivateMagicbricks}
-          portalConnection={portalConnection}
-          isLightMode={isLightMode}
-        />
-      )}
-
-      {portalModal === "projectRequired" && (
-        <ProjectRequiredModal
-          onClose={() => setPortalModal(null)}
-          onAttachProject={handleAttachProject}
-          isLightMode={isLightMode}
-        />
-      )}
-
-      {portalModal === "step1" && (
-        <IntegrationStep1Modal
-          onClose={() => setPortalModal(null)}
-          onContinue={() => setPortalModal("step2")}
-          isLightMode={isLightMode}
-        />
-      )}
-
-      {portalModal === "step2" && (
-        <IntegrationStep2Modal
-          onClose={() => setPortalModal(null)}
-          onBack={() => setPortalModal("step1")}
-          onConnect={(data) => {
-            setPortalConnection(data);
-            setPortalModal("step3");
-          }}
-          eligibleListings={eligibleListings}
-          isLightMode={isLightMode}
-        />
-      )}
-
-      {portalModal === "step3" && (
-        <IntegrationStep3Modal
-          onClose={() => setPortalModal(null)}
+      {/* Quikr Publish Modal */}
+      {quikrModalListing && (
+        <QuikrPublishModal
+          listing={quikrModalListing}
+          onClose={() => setQuikrModalListing(null)}
+          onPublish={handleQuikrPublishSuccess}
           isLightMode={isLightMode}
         />
       )}

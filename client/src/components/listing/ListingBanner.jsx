@@ -23,8 +23,7 @@ export default function ListingBanner({ isLightMode = false, onSetupSync }) {
               isLightMode ? "text-gray-600" : "text-gray-400"
             }`}
           >
-            Sync effortlessly with Magicbricks in a few
-            simple steps.
+            Publish your listings to Quikr Homes with one-click automation.
           </p>
         </div>
       </div>

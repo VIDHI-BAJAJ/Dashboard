@@ -2,11 +2,19 @@ const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
 require("dotenv").config();
+const mongoose = require("mongoose");
 
 const app = express();
 
 /* ===================== MIDDLEWARE ===================== */
 app.use(express.json());
+
+// Logging middleware to debug incoming requests
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Content-Type: ${req.get('Content-Type')}`);
+  next();
+});
+
 app.use(
   cors({
     origin: "*", // restrict later in prod
@@ -15,6 +23,10 @@ app.use(
   })
 );
 
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log("✅ MongoDB connected"))
+  .catch(err => console.error("❌ MongoDB error", err));
+  
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
 const BASE_URL = `https://api.airtable.com/v0/${process.env.AIRTABLE_BASE_ID}`;
@@ -28,8 +40,6 @@ const headers = {
 app.get("/", (req, res) => {
   res.send("Backend is live 🚀");
 });
-
-app.use('/api/portals/magicbricks', magicbricksRouter);
 
 /* ===================== AIRTABLE FETCH (GENERIC) ===================== */
 const fetchTable = async (tableName) => {
@@ -208,179 +218,42 @@ app.get("/api/conversations", async (req, res) => {
   }
 });
 
-/* ===================== LISTINGS (MOCK) ===================== */
-/* In production, replace with Airtable or DB persistence */
-const listingsStore = [];
+// ===================== LISTINGS (MongoDB) =====================
+const Listing = require('./models/Listing');
 
-// In-memory portal connection + listing maps (per broker)
-// In a real app, these would live in a proper database with broker auth
-const portalConnections = new Map(); // brokerId -> { portal, status, brokerId, xmlFeedUrl, listingIds }
-const portalListingMap = new Map(); // brokerId -> [listing]
-
-app.get("/api/listings", (req, res) => {
-  try {
-    res.json(listingsStore);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch listings" });
-  }
+// Portal connections removed - no longer using Magicbricks XML feed integration
+app.get("/api/listings", async (req, res) => {
+  const listings = await Listing.find();
+  console.log("DB name:", Listing.db.name);
+  console.log("Listings count:", listings.length);
+  res.json(listings);
 });
 
-app.post("/api/listings", (req, res) => {
+
+app.post("/api/listings", async (req, res) => {
   try {
-    const listing = req.body;
-    if (!listing) return res.status(400).json({ error: "Listing required" });
-    const id = listing.id || Date.now();
-    const record = { ...listing, id };
-    listingsStore.push(record);
-    res.status(201).json(record);
+    const listingData = req.body;
+    if (!listingData) return res.status(400).json({ error: "Listing data required" });
+    
+    // Create new listing document
+    const listing = new Listing(listingData);
+    
+    // Save to database
+    const savedListing = await listing.save();
+    res.status(201).json(savedListing);
   } catch (err) {
+    console.error("❌ Error creating listing:", err.message);
     res.status(500).json({ error: "Failed to create listing" });
   }
 });
 
-/* ===================== MAGICBRICKS PORTAL INTEGRATION ===================== */
+/* ===================== QUIKR HOMES INTEGRATION ===================== */
+const integrationRoutes = require("./routes/integration.routes");
+app.use("/api", integrationRoutes);
 
-// Helper: basic XML escaping for text nodes
-const xmlEscape = (value) =>
-  String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
-
-// Helper: build a simple Magicbricks-style XML feed for a broker
-const buildMagicbricksXml = (brokerId, listings) => {
-  const generatedAt = new Date().toISOString();
-
-  const itemsXml = listings
-    .map((l) => {
-      const id = l.id || "";
-      const title = l.name || l.propertyTitle || "";
-      const description = l.propertyDescription || "";
-      const city = l.city || l.operatingCity || "";
-      const locality = l.location || l.localityArea || "";
-      const price = l.price || l.propertyPrice || "";
-      const area = l.area || l.superBuiltUpArea || "";
-      const areaUnit = l.areaUnit || "sq.ft";
-      const bedrooms = l.bedrooms || l.bhkType || "";
-      const bathrooms = l.bathrooms || "";
-      const propertyType = l.propertyType || "";
-      const transactionType = l.transactionType || "";
-      const projectName = l.projectName || "";
-      const reraNumber = l.reraNumber || "";
-      const imageUrl = l.image || "";
-
-      return `
-    <property id="${xmlEscape(id)}">
-      <title>${xmlEscape(title)}</title>
-      <description>${xmlEscape(description)}</description>
-      <city>${xmlEscape(city)}</city>
-      <locality>${xmlEscape(locality)}</locality>
-      <price>${xmlEscape(price)}</price>
-      <area unit="${xmlEscape(areaUnit)}">${xmlEscape(area)}</area>
-      <bedrooms>${xmlEscape(bedrooms)}</bedrooms>
-      <bathrooms>${xmlEscape(bathrooms)}</bathrooms>
-      <property_type>${xmlEscape(propertyType)}</property_type>
-      <transaction_type>${xmlEscape(transactionType)}</transaction_type>
-      <project_name>${xmlEscape(projectName)}</project_name>
-      <rera_number>${xmlEscape(reraNumber)}</rera_number>
-      ${imageUrl ? `<image_url>${xmlEscape(imageUrl)}</image_url>` : ""}
-    </property>`;
-    })
-    .join("");
-
-  return `<?xml version="1.0" encoding="UTF-8"?>
-<magicbricks_feed generated_at="${xmlEscape(generatedAt)}">
-  <broker id="${xmlEscape(brokerId)}">
-    <properties>${itemsXml || "\n    "}</properties>
-  </broker>
-</magicbricks_feed>`;
-};
-
-/**
- * Initiate Magicbricks connection for a broker.
- * - No Magicbricks credentials are stored or required.
- * - Marks portal status as PENDING.
- * - Generates a broker-specific XML feed URL.
- * - Stores selected listings per broker for XML generation.
- */
-app.post("/api/portal/magicbricks/initiate", (req, res) => {
-  try {
-    const { brokerId, listingIds, listings } = req.body;
-
-    if (!brokerId) {
-      return res.status(400).json({ error: "brokerId is required" });
-    }
-    if (!Array.isArray(listingIds) || listingIds.length === 0) {
-      return res
-        .status(400)
-        .json({ error: "At least one listingId is required" });
-    }
-
-    // Use listings passed from client (subset of project-linked listings)
-    let selectedListings = Array.isArray(listings) ? listings : [];
-
-    // Fallback: if not provided, attempt to resolve from in-memory store
-    if (selectedListings.length === 0 && listingsStore.length > 0) {
-      selectedListings = listingsStore.filter((l) =>
-        listingIds.includes(l.id)
-      );
-    }
-
-    const safeBrokerId = String(brokerId);
-    const xmlFeedUrl = `${req.protocol}://${req.get(
-      "host"
-    )}/feeds/magicbricks/${encodeURIComponent(safeBrokerId)}.xml`;
-
-    portalConnections.set(safeBrokerId, {
-      portal: "magicbricks",
-      status: "PENDING",
-      brokerId: safeBrokerId,
-      xmlFeedUrl,
-      listingIds,
-    });
-
-    portalListingMap.set(safeBrokerId, selectedListings);
-
-    res.json({
-      portal: "magicbricks",
-      status: "PENDING",
-      brokerId: safeBrokerId,
-      xmlFeedUrl,
-      selectedListingIds: listingIds,
-    });
-  } catch (err) {
-    console.error("❌ Magicbricks initiate error:", err);
-    res.status(500).json({ error: "Failed to initiate Magicbricks connection" });
-  }
-});
-
-/**
- * Broker-specific Magicbricks XML feed.
- * Path format: GET /feeds/magicbricks/:brokerId.xml
- * - Magicbricks will PULL this feed on their schedule.
- * - XML is generated dynamically per broker from selected listings.
- */
-app.get("/feeds/magicbricks/:brokerId.xml", (req, res) => {
-  try {
-    const brokerId = req.params.brokerId;
-    const connection = portalConnections.get(brokerId);
-
-    if (!connection || connection.portal !== "magicbricks") {
-      return res.status(404).send("Magicbricks feed not found for this broker.");
-    }
-
-    const listings = portalListingMap.get(brokerId) || [];
-    const xml = buildMagicbricksXml(brokerId, listings);
-
-    res.set("Content-Type", "application/xml; charset=utf-8");
-    res.send(xml);
-  } catch (err) {
-    console.error("❌ Magicbricks feed error:", err);
-    res.status(500).send("Failed to generate Magicbricks XML feed.");
-  }
-});
+// Initialize auto-sync service
+const { scheduleAutoSync } = require('./services/auto-sync.service');
+scheduleAutoSync(30); // Run every 30 minutes
 
 /* ===================== START SERVER ===================== */
 app.listen(PORT, () => {
@@ -390,6 +263,9 @@ app.listen(PORT, () => {
   console.log(`GET   /api/revenue-stats`);
   console.log(`GET   /api/listings`);
   console.log(`POST  /api/listings`);
-  console.log(`POST  /api/portal/magicbricks/initiate`);
-  console.log(`GET   /feeds/magicbricks/:brokerId.xml`);
+  console.log(`POST  /api/integrations/quikr/publish`);
+  console.log(`POST  /api/integrations/quikr/publish/:listingId`);
+  console.log(`POST  /api/integrations/quikr/sync-pending`);
+  console.log('');
+  console.log('🔄 Auto-sync service scheduled to run every 30 minutes');
 });

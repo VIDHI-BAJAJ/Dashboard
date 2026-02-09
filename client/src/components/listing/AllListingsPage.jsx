@@ -1,9 +1,10 @@
+import { forwardRef } from "react";
 import ListingBanner from "./ListingBanner";
 import ListingFilters from "./ListingFilters";
 import ListingCard from "./ListingCard";
 import { glassBase, glassLight, glassDark } from "./constants";
 
-export default function AllListingsPage({
+const AllListingsPage = forwardRef(function AllListingsPage({
   listings,
   sortedListings,
   viewMode,
@@ -12,15 +13,17 @@ export default function AllListingsPage({
   setSortBy,
   onNavigateToAdd,
   onSetupSync,
-  showPublish = false,
-  onPublish,
+  onPublishToQuikr,
   isLightMode = false,
-}) {
+}, ref) {
   return (
     <>
       <ListingBanner isLightMode={isLightMode} onSetupSync={onSetupSync} />
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-8 mx-4 md:mx-6">
+      <div
+        ref={ref}
+        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-8 mx-4 md:mx-6"
+      >
         <h1
           className={`text-2xl font-bold ${
             isLightMode ? "text-gray-900" : "text-gray-100"
@@ -29,19 +32,6 @@ export default function AllListingsPage({
           All Listings
         </h1>
         <div className="flex flex-col items-stretch gap-2 sm:items-end">
-          {showPublish && (
-            <button
-              type="button"
-              onClick={onPublish}
-              className={`font-medium px-5 py-2.5 rounded-xl transition-colors w-fit ${
-                isLightMode
-                  ? "bg-emerald-600 text-white hover:bg-emerald-500"
-                  : "bg-emerald-600 text-white hover:bg-emerald-500"
-              }`}
-            >
-              Publish
-            </button>
-          )}
           <button
             type="button"
             onClick={onNavigateToAdd}
@@ -104,10 +94,13 @@ export default function AllListingsPage({
               key={listing.id}
               listing={listing}
               isLightMode={isLightMode}
+              onPublishToQuikr={onPublishToQuikr}
             />
           ))
         )}
       </div>
     </>
   );
-}
+});
+
+export default AllListingsPage;
