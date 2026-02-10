@@ -16,7 +16,7 @@ export default function Dashboard() {
     const fetchData = async () => {
       try {
         // Fetch leads data from the API
-        const response = await fetch('https://dashboard-pura.onrender.com/api/leads');
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/leads`);
         const leads = await response.json();
         
         // Store leads data for the table
