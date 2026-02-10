@@ -1,6 +1,6 @@
 import React from "react";
-import CRMAnalytics from "./CRMAnalytics.jsx";
+import NavbarLayout from "./components/NavbarLayout.jsx";
 
 export default function App() {
-  return <CRMAnalytics />;
+  return <NavbarLayout />;
 }

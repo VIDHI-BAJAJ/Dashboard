@@ -1,53 +1,13 @@
 @import "tailwindcss";
 
-/* :root {
-  color-scheme: light;
-}
-
-body {
-  margin: 0;
-  min-height: 100vh;
-  background: linear-gradient(
-    135deg,
-    #eef2ff,
-    #f8fafc
-  );
-  color: #0f172a;
-}
- */
-
-@layer utilities {
-  .glass {
-    @apply backdrop-blur-xl backdrop-saturate-150
-           border border-white/20
-           shadow-[0_20px_50px_rgba(0,0,0,0.25),inset_0_1px_1px_rgba(255,255,255,0.25)]
-           rounded-2xl;
-  }
-
-  .glass-light {
-    @apply bg-white/40 text-gray-900;
-  }
-
-  .glass-dark {
-    @apply bg-white/10 text-gray-100 border-white/10;
-  }
-
-  .glass-hover {
-    @apply transition-all duration-300 hover:-translate-y-0.5
-           hover:shadow-[0_30px_60px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.35)];
-  }
-}
-
-@media (hover: none) {
-  .glass-hover {
-    transform: none !important;
-  }
-}
-
 html,
 body {
-  height: auto;
-  min-height: 100%;
-  overflow-y: auto;
-  overflow-x: hidden;
+	height: 100%;
+	min-height: 100%;
+	margin: 0;
+	padding: 0;
+	background-color: #fff;
+	color: #000;
+	overflow-y: auto;
+	overflow-x: hidden;
 }
