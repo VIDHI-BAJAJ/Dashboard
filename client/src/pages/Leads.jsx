@@ -9,7 +9,7 @@ export default function Leads() {
     const fetchLeads = async () => {
       try {
         // Fetch leads data from the API
-        const response = await fetch('http://localhost:5000/api/leads');
+        const response = await fetch('https://dashboard-vert-two-57.vercel.app/api/leads');
         const data = await response.json();
         setLeads(data);
       } catch (error) {
