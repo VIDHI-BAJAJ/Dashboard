@@ -3,11 +3,8 @@ const axios = require("axios");
 const cors = require("cors");
 require("dotenv").config();
 
-
 const app = express();
-
-
-
+app.use(express.json());
 app.use(
   cors({
     origin: "*", // restrict later in prod
@@ -15,7 +12,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
