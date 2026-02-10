@@ -7,11 +7,12 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "*", // restrict later in prod
+    origin: "https://dashboard-vert-two-57.vercel.app", 
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
