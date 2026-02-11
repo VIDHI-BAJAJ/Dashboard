@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar.jsx";
 import BottomNav from "./BottomNav.jsx";
@@ -14,77 +14,157 @@ export default function NavbarLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const location = useLocation();
 
-  const isAuthRoute = false; // reserved for future auth routing
+  // 🔔 Notifications
+  const [notifications, setNotifications] = useState([
+    { id: 1, message: "New lead added: Rohan Sharma", read: false },
+    { id: 2, message: "New message from Tanisha Mehta", read: false },
+    { id: 3, message: "Meeting reminder at 4 PM", read: true },
+  ]);
+
+  const [showNotifications, setShowNotifications] = useState(false);
+  const dropdownRef = useRef(null);
+
+  const unreadCount = notifications.filter((n) => !n.read).length;
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className="min-h-screen  flex">
-      {/* Sidebar for desktop */}
+    <div className="min-h-screen flex">
       <Sidebar collapsed={collapsed} />
 
-      {/* Main content area */}
       <div
         className={`flex-1 flex flex-col transition-[padding] duration-300 ${
           collapsed ? "lg:pl-20" : "lg:pl-60"
         }`}
       >
-        {/* Top bar (for collapse toggle on desktop) */}
-    <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-3 border-b border-white/10 bg-black backdrop-blur-sm">
+        {/* 🔥 TOP NAVBAR */}
+        <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-3 border-b border-white/10 bg-black backdrop-blur-sm">
 
-  {/* LEFT SIDE */}
-  <div className="flex items-center gap-4">
-    <button
-      type="button"
-      onClick={() => setCollapsed((v) => !v)}
-      className="hidden lg:inline-flex h-8 w-8 items-center justify-center rounded-full border border-white/25 text-xs text-gray-200 hover:bg-white hover:text-black transition-colors duration-200"
-    >
-      <svg
-        className="w-4 h-4"
-        viewBox="0 0 20 20"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-      >
-        {collapsed ? (
-          <path d="M7 4l6 6-6 6" />
-        ) : (
-          <path d="M13 4L7 10l6 6" />
-        )}
-      </svg>
-    </button>
+          {/* 🔍 SEARCH (Hidden on mobile) */}
+          <div className="hidden md:block flex-1 max-w-md">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search leads, conversations..."
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 text-white placeholder-gray-400 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+              />
+              <svg
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-4.35-4.35M16 10a6 6 0 11-12 0 6 6 0 0112 0z"
+                />
+              </svg>
+            </div>
+          </div>
 
-    <div>
-      <p className="text-xs uppercase tracking-[0.25em] text-gray-500">
-        Harbour AI
-      </p>
-      <p className="text-sm font-medium text-white">
-        {location.pathname.replace("/", "").split("/")[0] || "Dashboard"}
-      </p>
-    </div>
-  </div>
+          {/* RIGHT SIDE */}
+          <div className="flex items-center gap-6 ml-auto">
 
-  {/* RIGHT SIDE */}
-  <div className="flex items-center gap-3 ml-auto">
-    
-    {/* Name */}
-    <div className="text-right hidden sm:block">
-      <p className="text-sm font-medium text-white">
-        Vidhi Bajaj
-      </p>
-      <p className="text-xs text-gray-400">
-        Admin
-      </p>
-    </div>
+            {/* 🔔 NOTIFICATION BELL */}
+            <div className="relative" ref={dropdownRef}>
+              <div
+                className="cursor-pointer"
+                onClick={() => setShowNotifications(!showNotifications)}
+              >
+                <svg
+                  className="w-6 h-6 text-gray-300 hover:text-white transition-colors"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14V11a6 6 0 10-12 0v3c0 .386-.149.735-.405 1.005L4 17h5m6 0a3 3 0 11-6 0h6z"
+                  />
+                </svg>
 
-    {/* Avatar */}
-    <div className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition-transform duration-200">
-      VB
-    </div>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
 
-  </div>
-</header>
+              {/* DROPDOWN */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b font-semibold text-gray-800">
+                    Notifications
+                  </div>
 
+                  <div className="max-h-64 overflow-y-auto">
+                    {notifications.length === 0 ? (
+                      <div className="p-4 text-sm text-gray-500">
+                        No notifications
+                      </div>
+                    ) : (
+                      notifications.map((notif) => (
+                        <div
+                          key={notif.id}
+                          className={`px-4 py-3 text-sm cursor-pointer hover:bg-gray-100 ${
+                            !notif.read ? "bg-gray-50 font-medium" : ""
+                          }`}
+                          onClick={() => {
+                            setNotifications((prev) =>
+                              prev.map((n) =>
+                                n.id === notif.id
+                                  ? { ...n, read: true }
+                                  : n
+                              )
+                            );
+                          }}
+                        >
+                          {notif.message}
+                        </div>
+                      ))
+                    )}
+                  </div>
 
-        {/* Page content */}
+                  <div className="px-4 py-2 text-center text-xs text-gray-500 border-t">
+                    Click notification to mark as read
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 👤 USER INFO */}
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-medium text-white">
+                Vidhi Bajaj
+              </p>
+              <p className="text-xs text-gray-400">
+                Admin
+              </p>
+            </div>
+
+            {/* 👤 AVATAR */}
+            <div className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition-transform duration-200">
+              VB
+            </div>
+          </div>
+        </header>
+
+        {/* MAIN CONTENT */}
         <main className="flex-1 px-4 py-6 pb-24 lg:pb-8">
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
@@ -92,7 +172,10 @@ export default function NavbarLayout() {
             <Route path="/leads" element={<Leads />} />
             <Route path="/leads/:leadId" element={<LeadDetails />} />
             <Route path="/conversations" element={<Conversations />} />
-            <Route path="/conversations/:conversationId" element={<ConversationDetails />} />
+            <Route
+              path="/conversations/:conversationId"
+              element={<ConversationDetails />}
+            />
             <Route path="/listing" element={<Listing />} />
             <Route path="/segmentation" element={<Segmentation />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
@@ -100,8 +183,7 @@ export default function NavbarLayout() {
         </main>
       </div>
 
-      {/* Bottom navigation for mobile */}
-      {!isAuthRoute && <BottomNav />}
+      <BottomNav />
     </div>
   );
 }
