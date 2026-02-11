@@ -119,7 +119,7 @@ const ConversationsTable = ({ conversations = [], loading = false, totalCount = 
                   <tr 
                     key={conversation.id || index} 
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
-                    onClick={() => navigate(`/conversations/${conversation.id}`)}
+                    onClick={() => navigate(`/conversations/${conversation.fields?.Name}`)}
                   >    
                     <td className="px-4 sm:px-6 py-3 sm:py-4">
                       <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-xs">

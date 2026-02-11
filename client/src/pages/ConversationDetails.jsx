@@ -9,60 +9,45 @@ const ConversationDetails = () => {
   const [error, setError] = useState(null);
   const [newMessage, setNewMessage] = useState('');
 
-  useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        // Use VITE_API_URL for production, fallback to relative path for local development
-        const apiUrl = import.meta.env.VITE_API_URL || '';
-        const response = await fetch(`${apiUrl}/api/conversations`);
-        
-        if (!response.ok) {
-          throw new Error('Failed to fetch conversations');
-        }
-        
-        const allConversations = await response.json();
-        
-        // Find the specific conversation record to get the contact identifier
-        const currentConversation = allConversations.find(c => c.id === conversationId);
-        if (!currentConversation) {
-          setError('Conversation not found');
-          return;
-        }
-        
-        // Get the contact identifier from the current conversation
-        const contactId = currentConversation.fields?.['WA ID'] || currentConversation.fields?.WA_ID;
-        const contactName = currentConversation.fields?.Name;
-        
-        // Filter all conversations for the same contact (based on WA ID or Name)
-        let filteredConversations = [];
-        if (contactId) {
-          filteredConversations = allConversations.filter(c => 
-            (c.fields?.['WA ID'] === contactId || c.fields?.WA_ID === contactId)
-          );
-        } else if (contactName) {
-          filteredConversations = allConversations.filter(c => 
-            c.fields?.Name === contactName
-          );
-        }
-        
-        // Sort conversations chronologically (oldest first, so they appear in order)
-        filteredConversations.sort((a, b) => {
-          const dateA = new Date(a.fields?.Timestamp || a.createdTime);
-          const dateB = new Date(b.fields?.Timestamp || b.createdTime);
-          return dateA - dateB; // Ascending order (oldest first)
-        });
-        
-        setContactConversations(filteredConversations);
-      } catch (err) {
-        console.error('Error fetching conversations:', err);
-        setError('Error loading conversation details');
-      } finally {
-        setLoading(false);
-      }
-    };
+ useEffect(() => {
+  const fetchConversations = async () => {
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL || "";
+      const response = await fetch(`${apiUrl}/api/conversations`);
 
-    fetchConversations();
-  }, [conversationId]);
+      if (!response.ok) {
+        throw new Error("Failed to fetch conversations");
+      }
+
+      const allConversations = await response.json();
+
+      // ✅ Filter ONLY by Name
+      const filteredConversations = allConversations.filter(
+        (c) => c.fields?.Name === conversationId
+      );
+
+      // Sort oldest → newest
+      filteredConversations.sort((a, b) => {
+        const dateA = new Date(
+          a.fields?.Timestamp || a.createdTime
+        );
+        const dateB = new Date(
+          b.fields?.Timestamp || b.createdTime
+        );
+        return dateA - dateB;
+      });
+
+      setContactConversations(filteredConversations);
+    } catch (err) {
+      console.error(err);
+      setError("Error loading conversation details");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchConversations();
+}, [conversationId]);
 
   const formatDate = (dateString) => {
     if (!dateString) return '—';
