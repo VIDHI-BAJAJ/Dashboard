@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./Sidebar.jsx";
 import BottomNav from "./BottomNav.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
@@ -12,9 +12,8 @@ import ConversationDetails from "../pages/ConversationDetails.jsx";
 
 export default function NavbarLayout() {
   const [collapsed, setCollapsed] = useState(false);
-  const location = useLocation();
 
-  // 🔔 Notifications
+  // 🔔 Notification State
   const [notifications, setNotifications] = useState([
     { id: 1, message: "New lead added: Rohan Sharma", read: false },
     { id: 2, message: "New message from Tanisha Mehta", read: false },
@@ -26,7 +25,7 @@ export default function NavbarLayout() {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Close dropdown on outside click
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -49,7 +48,7 @@ export default function NavbarLayout() {
         }`}
       >
         {/* 🔥 TOP NAVBAR */}
-        <header className="sticky top-0 z-30 flex items-center justify-between px-6 py-3 border-b border-white/10 bg-black backdrop-blur-sm">
+        <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 border-b border-white/10 bg-black backdrop-blur-sm">
 
           {/* 🔍 SEARCH (Hidden on mobile) */}
           <div className="hidden md:block flex-1 max-w-md">
@@ -76,9 +75,9 @@ export default function NavbarLayout() {
           </div>
 
           {/* RIGHT SIDE */}
-          <div className="flex items-center gap-6 ml-auto">
+          <div className="flex items-center gap-4 md:gap-6 ml-auto">
 
-            {/* 🔔 NOTIFICATION BELL */}
+            {/* 🔔 NOTIFICATION */}
             <div className="relative" ref={dropdownRef}>
               <div
                 className="cursor-pointer"
@@ -105,9 +104,23 @@ export default function NavbarLayout() {
                 )}
               </div>
 
-              {/* DROPDOWN */}
+              {/* ✅ RESPONSIVE DROPDOWN (FIXED FOR MOBILE) */}
               {showNotifications && (
-                <div className="absolute right-0 mt-3 w-80 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
+                <div
+                  className="
+                    fixed md:absolute
+                    top-14 md:top-12
+                    left-0 md:left-auto
+                    right-0 md:right-0
+                    w-full md:w-80
+                    bg-white
+                    md:rounded-xl
+                    shadow-xl
+                    border border-gray-200
+                    overflow-hidden
+                    z-50
+                  "
+                >
                   <div className="px-4 py-3 border-b font-semibold text-gray-800">
                     Notifications
                   </div>
