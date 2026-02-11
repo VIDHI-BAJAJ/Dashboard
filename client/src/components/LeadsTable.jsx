@@ -50,69 +50,6 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
     return date.toLocaleDateString();
   };
 
-  // Find conversation for a lead by matching name or phone
-  const findConversationForLead = async (lead) => {
-    try {
-      // Use VITE_API_URL for production, fallback to relative path for local development
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/conversations`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch conversations');
-      }
-      
-      const conversations = await response.json();
-      
-      // Get lead identifiers
-      const leadName = lead.fields?.['Full Name'] || lead.fields?.Name;
-      const leadPhone = lead.fields?.Phone;
-      
-      // Find matching conversation
-      const matchingConversation = conversations.find(conv => {
-        const convName = conv.fields?.Name;
-        const convWaId = conv.fields?.['WA ID'] || conv.fields?.WA_ID;
-        
-        // Match by name (exact or partial)
-        if (leadName && convName && 
-            (convName.toLowerCase().includes(leadName.toLowerCase()) || 
-             leadName.toLowerCase().includes(convName.toLowerCase()))) {
-          return true;
-        }
-        
-        // Match by phone/WA ID
-        if (leadPhone && convWaId && 
-            (convWaId.includes(leadPhone) || leadPhone.includes(convWaId))) {
-          return true;
-        }
-        
-        return false;
-      });
-      
-      return matchingConversation;
-    } catch (error) {
-      console.error('Error finding conversation for lead:', error);
-      return null;
-    }
-  };
-
-  // Handle lead click - redirect to conversation details
-  const handleLeadClick = async (lead) => {
-    try {
-      const conversation = await findConversationForLead(lead);
-      
-      if (conversation) {
-        navigate(`/conversations/${conversation.id}`);
-      } else {
-        // If no conversation found, redirect to lead details as fallback
-        navigate(`/leads/${lead.id}`);
-      }
-    } catch (error) {
-      console.error('Error handling lead click:', error);
-      // Fallback to lead details
-      navigate(`/leads/${lead.id}`);
-    }
-  };
-
   if (loading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
@@ -176,7 +113,7 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
                   <tr 
                     key={lead.id || index} 
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
-                    onClick={() => handleLeadClick(lead)}
+                    onClick={() => navigate(`/leads/${lead.id}`)}
                   >    
                     <td className="px-4 sm:px-6 py-3 sm:py-4">
                       <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-xs">
