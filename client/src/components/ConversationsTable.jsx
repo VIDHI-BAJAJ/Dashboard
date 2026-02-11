@@ -1,36 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
+const ConversationsTable = ({ conversations = [], loading = false, totalCount = 0 }) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [selectedLeads, setSelectedLeads] = useState(new Set());
+  const [selectedConversations, setSelectedConversations] = useState(new Set());
 
-  // Pagination logic
-  const totalPages = Math.ceil(leads.length / itemsPerPage);
+  // Pagination logic - conversations are already sorted by the parent component
+  const totalPages = Math.ceil(conversations.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentLeads = leads.slice(startIndex, endIndex);
+  const currentConversations = conversations.slice(startIndex, endIndex);
 
-  // Handle selecting/deselecting all leads
+  // Handle selecting/deselecting all conversations
   const toggleSelectAll = () => {
-    if (selectedLeads.size === currentLeads.length) {
-      setSelectedLeads(new Set());
+    if (selectedConversations.size === currentConversations.length) {
+      setSelectedConversations(new Set());
     } else {
-      setSelectedLeads(new Set(currentLeads.map(lead => lead.id)));
+      setSelectedConversations(new Set(currentConversations.map(conv => conv.id)));
     }
   };
 
-  // Handle individual lead selection
-  const toggleSelectLead = (leadId) => {
-    const newSelected = new Set(selectedLeads);
-    if (newSelected.has(leadId)) {
-      newSelected.delete(leadId);
+  // Handle individual conversation selection
+  const toggleSelectConversation = (convId) => {
+    const newSelected = new Set(selectedConversations);
+    if (newSelected.has(convId)) {
+      newSelected.delete(convId);
     } else {
-      newSelected.add(leadId);
+      newSelected.add(convId);
     }
-    setSelectedLeads(newSelected);
+    setSelectedConversations(newSelected);
   };
 
   // Format relative time
@@ -50,74 +50,17 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
     return date.toLocaleDateString();
   };
 
-  // Find conversation for a lead by matching name or phone
-  const findConversationForLead = async (lead) => {
-    try {
-      // Use VITE_API_URL for production, fallback to relative path for local development
-      const apiUrl = import.meta.env.VITE_API_URL || '';
-      const response = await fetch(`${apiUrl}/api/conversations`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch conversations');
-      }
-      
-      const conversations = await response.json();
-      
-      // Get lead identifiers
-      const leadName = lead.fields?.['Full Name'] || lead.fields?.Name;
-      const leadPhone = lead.fields?.Phone;
-      
-      // Find matching conversation
-      const matchingConversation = conversations.find(conv => {
-        const convName = conv.fields?.Name;
-        const convWaId = conv.fields?.['WA ID'] || conv.fields?.WA_ID;
-        
-        // Match by name (exact or partial)
-        if (leadName && convName && 
-            (convName.toLowerCase().includes(leadName.toLowerCase()) || 
-             leadName.toLowerCase().includes(convName.toLowerCase()))) {
-          return true;
-        }
-        
-        // Match by phone/WA ID
-        if (leadPhone && convWaId && 
-            (convWaId.includes(leadPhone) || leadPhone.includes(convWaId))) {
-          return true;
-        }
-        
-        return false;
-      });
-      
-      return matchingConversation;
-    } catch (error) {
-      console.error('Error finding conversation for lead:', error);
-      return null;
-    }
-  };
-
-  // Handle lead click - redirect to conversation details
-  const handleLeadClick = async (lead) => {
-    try {
-      const conversation = await findConversationForLead(lead);
-      
-      if (conversation) {
-        navigate(`/conversations/${conversation.id}`);
-      } else {
-        // If no conversation found, redirect to lead details as fallback
-        navigate(`/leads/${lead.id}`);
-      }
-    } catch (error) {
-      console.error('Error handling lead click:', error);
-      // Fallback to lead details
-      navigate(`/leads/${lead.id}`);
-    }
+  // Get direction indicator
+  const getDirectionIndicator = (direction) => {
+    if (!direction) return null;
+    return direction === 'Outbound' ? '→' : '←';
   };
 
   if (loading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
-          <h3 className="text-lg font-semibold text-gray-900">Leads</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Conversations</h3>
           <div className="text-sm text-gray-500">Loading...</div>
         </div>
         <div className="space-y-3 sm:space-y-4">
@@ -140,7 +83,7 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
       {/* Table Header */}
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 bg-gray-50">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <h3 className="text-lg font-semibold text-gray-900">Leads</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Conversations</h3>
           <div className="text-sm text-gray-500">
             {totalCount} total
           </div>
@@ -155,7 +98,7 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
               <thead className="bg-gray-50">
                 <tr>
                   <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Name
+                    Contact
                   </th>
                   <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                     Phone
@@ -164,48 +107,48 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
                     Channel
                   </th>
                   <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                    Last Activity
+                    Last Message
                   </th>
                   <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                    Snippet
+                    Preview
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {currentLeads.map((lead, index) => (
+                {currentConversations.map((conversation, index) => (
                   <tr 
-                    key={lead.id || index} 
+                    key={conversation.id || index} 
                     className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
-                    onClick={() => handleLeadClick(lead)}
+                    onClick={() => navigate(`/conversations/${conversation.id}`)}
                   >    
                     <td className="px-4 sm:px-6 py-3 sm:py-4">
                       <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-xs">
-                        {lead.fields?.['Full Name'] || lead.fields?.Name || '—'}
+                        {conversation.fields?.Name || '—'}
                       </div>
                     </td>
                     <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden sm:table-cell">
                       <div className="text-sm text-gray-700 truncate max-w-[100px]">
-                        {lead.fields?.Phone || '—'}
+                        {conversation.fields?.['WA ID'] || conversation.fields?.WA_ID || '—'}
                       </div>
                     </td>
                     <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                      {lead.fields?.Channel ? (
-                        <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 truncate max-w-[80px] sm:max-w-none">
-                          {lead.fields.Channel}
+                      <div className="flex items-center">
+                        <span className={`inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium ${
+                          conversation.fields?.Channel === 'WhatsApp' 
+                            ? 'bg-gray-100 text-gray-800' 
+                            : 'bg-gray-800 text-white'
+                        }`}>
+                          {getDirectionIndicator(conversation.fields?.Channel)} {conversation.fields?.Channel || '—'}
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          —
-                        </span>
-                      )}
+                      </div>
                     </td>
                     <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700 hidden md:table-cell">
-                      {lead.fields?.['Last Message At'] 
-                        ? formatRelativeTime(lead.fields['Last Message At'])
-                        : formatRelativeTime(lead.createdTime)}
+                      {conversation.fields?.Timestamp 
+                        ? formatRelativeTime(conversation.fields.Timestamp)
+                        : formatRelativeTime(conversation.createdTime)}
                     </td>
                     <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm text-gray-500 max-w-[100px] sm:max-w-xs truncate hidden lg:table-cell">
-                      {lead.fields?.['Body Text'] || lead.fields?.Summary || '—'}
+                      {conversation.fields?.['Body Text'] || conversation.fields?.body || '—'}
                     </td>
                   </tr>
                 ))}
@@ -219,7 +162,7 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
       {totalPages > 1 && (
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
-            Showing {startIndex + 1} to {Math.min(endIndex, leads.length)} of {leads.length} results
+            Showing {startIndex + 1} to {Math.min(endIndex, conversations.length)} of {conversations.length} contacts
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
@@ -261,13 +204,13 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
         </div>
       )}
 
-      {currentLeads.length === 0 && !loading && (
+      {currentConversations.length === 0 && !loading && (
         <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-          <p className="text-gray-500 text-sm sm:text-base">No leads found</p>
+          <p className="text-gray-500 text-sm sm:text-base">No conversations found</p>
         </div>
       )}
     </div>
   );
 };
 
-export default LeadsTable;
+export default ConversationsTable;

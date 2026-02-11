@@ -26,14 +26,14 @@ const LeadsOverviewChart = ({ data = [], timeRange = 'this-month', onTimeRangeCh
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-90">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 h-80">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
         <h3 className="text-lg font-semibold text-gray-900">Leads Overview</h3>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <select 
             value={timeRange}
             onChange={(e) => onTimeRangeChange(e.target.value)}
-            className="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-400"
+            className="text-xs border border-gray-300 rounded-md px-2 py-1 bg-white text-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-400 w-full sm:w-auto"
           >
             {timeRangeOptions.map(option => (
               <option key={option.value} value={option.value}>{option.label}</option>
@@ -41,42 +41,42 @@ const LeadsOverviewChart = ({ data = [], timeRange = 'this-month', onTimeRangeCh
           </select>
         </div>
       </div>
-   <ResponsiveContainer width="100%" height="85%">
-  <LineChart
-    data={data}
-    margin={{ top: 10, right: 20, left: 0, bottom: 20 }}
-  >
-    <CartesianGrid vertical={false} stroke="#e5e7eb" strokeDasharray="2 2" />
+      <ResponsiveContainer width="100%" height="80%">
+        <LineChart
+          data={data}
+          margin={{ top: 10, right: 15, left: 0, bottom: 20 }}
+        >
+          <CartesianGrid vertical={false} stroke="#e5e7eb" strokeDasharray="2 2" />
 
-    <XAxis
-      dataKey="time"
-      tick={{ fontSize: 12 }}
-      angle={-35}
-      textAnchor="end"
-      height={45}
-      axisLine={false}
-      tickLine={false}
-    />
+          <XAxis
+            dataKey="time"
+            tick={{ fontSize: 10, fill: '#6b7280' }}
+            angle={-35}
+            textAnchor="end"
+            height={45}
+            axisLine={false}
+            tickLine={false}
+          />
 
-    <YAxis
-      width={30}
-      tick={{ fontSize: 12 }}
-      axisLine={false}
-      tickLine={false}
-    />
+          <YAxis
+            width={25}
+            tick={{ fontSize: 10, fill: '#6b7280' }}
+            axisLine={false}
+            tickLine={false}
+          />
 
-    <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} />
 
-    <Line
-      type="monotone"
-      dataKey="totalLeads"
-      stroke="#111111"
-      strokeWidth={2}
-      dot={{ r: 4 }}
-      activeDot={{ r: 6 }}
-    />
-  </LineChart>
-</ResponsiveContainer>
+          <Line
+            type="monotone"
+            dataKey="totalLeads"
+            stroke="#111111"
+            strokeWidth={2}
+            dot={{ r: 4 }}
+            activeDot={{ r: 6 }}
+          />
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 };

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import MetricCard from "./MetricCard";
 import { Users, MessageCircle, CheckCircle, TrendingUp } from "lucide-react";
 
-const API_BASE_URL = "http://localhost:5000";
+// Use VITE_API_URL for production, fallback to relative path for local development
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export default function MetricsGrid() {
   const [metrics, setMetrics] = useState({
@@ -17,9 +18,19 @@ export default function MetricsGrid() {
     let offset = null;
 
     do {
-      const url = offset
-        ? `${API_BASE_URL}${endpoint}?offset=${offset}`
-        : `${API_BASE_URL}${endpoint}`;
+      // Construct URL differently based on whether we're using a full URL or relative path
+      let url;
+      if (API_BASE_URL.startsWith('http')) {
+        // Production environment with full URL
+        url = offset
+          ? `${API_BASE_URL}${endpoint}?offset=${offset}`
+          : `${API_BASE_URL}${endpoint}`;
+      } else {
+        // Local development with relative path (Vite proxy)
+        url = offset
+          ? `${endpoint}?offset=${offset}`
+          : `${endpoint}`;
+      }
 
       const response = await fetch(url);
       if (!response.ok) {
@@ -119,6 +130,7 @@ export default function MetricsGrid() {
       <div className="hidden md:hidden lg:grid lg:grid-cols-5 gap-6 mb-8">
         <MetricCard
           title="Leads"
+          subtitle="Total captured this month"
           value={metrics.totalLeads.value}
           icon={<Users size={20} className="text-gray-500" />}
           percentage={metrics.totalLeads.percentage}
@@ -128,6 +140,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Conversations"
+          subtitle="Total captured this month"
           value={metrics.totalConversations.value}
           icon={<MessageCircle size={20} className="text-gray-500" />}
           percentage={metrics.totalConversations.percentage}
@@ -136,6 +149,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Speed To Lead"
+          subtitle="Total captured this month"
           value={metrics.totalConversations.value}
           icon={<MessageCircle size={20} className="text-gray-500" />}
           percentage={metrics.totalConversations.percentage}
@@ -144,6 +158,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Tasks Due Today"
+          subtitle="Total captured this month"
           value={metrics.tasksDueToday.value}
           icon={<CheckCircle size={20} className="text-gray-500" />}
           percentage={metrics.tasksDueToday.percentage}
@@ -152,6 +167,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Deals Won"
+          subtitle="Total captured this month"
           value={metrics.dealsWon.value}
           icon={<TrendingUp size={20} className="text-gray-500" />}
           percentage={metrics.dealsWon.percentage}
@@ -164,6 +180,7 @@ export default function MetricsGrid() {
       <div className="hidden md:grid md:grid-cols-2 lg:hidden gap-6 mb-8">
         <MetricCard
           title="Leads"
+          subtitle="Total captured this month"
           value={metrics.totalLeads.value}
           icon={<Users size={20} className="text-gray-500" />}
           percentage={metrics.totalLeads.percentage}
@@ -173,6 +190,7 @@ export default function MetricsGrid() {
         />
          <MetricCard
           title="Conversations"
+          subtitle="Total captured this month"
           value={metrics.totalConversations.value}
           icon={<MessageCircle size={20} className="text-gray-500" />}
           percentage={metrics.totalConversations.percentage}
@@ -181,6 +199,7 @@ export default function MetricsGrid() {
         />
           <MetricCard
           title="Speed To Lead"
+          subtitle="Total captured this month"
           value={metrics.totalConversations.value}
           icon={<MessageCircle size={20} className="text-gray-500" />}
          percentage={metrics.totalConversations.percentage}
@@ -189,6 +208,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Tasks Due Today"
+          subtitle="Total captured this month"
           value={metrics.tasksDueToday.value}
           icon={<CheckCircle size={20} className="text-gray-500" />}
           percentage={metrics.tasksDueToday.percentage}
@@ -197,6 +217,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Deals Won"
+          subtitle="Total captured this month"
           value={metrics.dealsWon.value}
           icon={<TrendingUp size={20} className="text-gray-500" />}
           percentage={metrics.dealsWon.percentage}
@@ -209,6 +230,7 @@ export default function MetricsGrid() {
       <div className="md:hidden grid grid-cols gap-6 mb-8">
         <MetricCard
           title="Leads"
+          subtitle="Total captured this month"
           value={metrics.totalLeads.value}
           icon={<Users size={20} className="text-gray-500" />}
           percentage={metrics.totalLeads.percentage}
@@ -218,6 +240,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Conversations"
+          subtitle="Total captured this month"
           value={metrics.totalConversations.value}
           icon={<MessageCircle size={20} className="text-gray-500" />}
           percentage={metrics.totalConversations.percentage}
@@ -226,6 +249,7 @@ export default function MetricsGrid() {
         />
           <MetricCard
           title="Speed To Lead"
+          subtitle="Total captured this month"
           value={metrics.totalConversations.value}
           icon={<MessageCircle size={20} className="text-gray-500" />}
          percentage={metrics.totalConversations.percentage}
@@ -234,6 +258,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Tasks Due Today"
+          subtitle="Total captured this month"
           value={metrics.tasksDueToday.value}
           icon={<CheckCircle size={20} className="text-gray-500" />}
           percentage={metrics.tasksDueToday.percentage}
@@ -242,6 +267,7 @@ export default function MetricsGrid() {
         />
         <MetricCard
           title="Deals Won"
+          subtitle="Total captured this month"
           value={metrics.dealsWon.value}
           icon={<TrendingUp size={20} className="text-gray-500" />}
           percentage={metrics.dealsWon.percentage}
