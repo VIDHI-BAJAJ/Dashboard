@@ -7,12 +7,11 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://dashboard-vert-two-57.vercel.app", 
+    origin: "*", // restrict later in prod
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
 
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
@@ -136,6 +135,24 @@ app.get("/api/conversations", async (req, res) => {
     res.json(await fetchTable("Conversations"));
   } catch {
     res.status(500).json({ error: "Failed to fetch Conversations" });
+  }
+});
+
+/* ===================== CREATE CONVERSATION ===================== */
+app.post("/api/conversations", async (req, res) => {
+  try {
+    const { fields } = req.body;
+
+    if (!fields) {
+      return res.status(400).json({ error: "Fields are required" });
+    }
+
+    const response = await axios.post(`${BASE_URL}/Conversations`, { fields }, { headers });
+    res.status(201).json(response.data);
+  } catch (err) {
+    console.error("❌ Create Conversation Error:", err.response ? err.response.data : err.message);   
+
+    res.status(500).json({ error: "Failed to create conversation" });
   }
 });
 
