@@ -48,15 +48,24 @@ export default function NavbarLayout() {
         }`}
       >
         {/* 🔥 TOP NAVBAR */}
-        <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 border-b border-white/10 bg-black backdrop-blur-sm">
+        <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 bg-white backdrop-blur-sm">
 
-          {/* 🔍 SEARCH (Hidden on mobile) */}
+          {/* 🔷 LEFT SIDE (Mobile Logo + Name) */}
+          <div className="flex items-center gap-2 md:hidden">
+            {/* Logo */}
+            {/* Company Name */}
+            <span className="text-lg font-semibold text-black tracking-tight">
+              HARBOUR AI
+            </span>
+          </div>
+
+          {/* 🔍 SEARCH (Desktop Only) */}
           <div className="hidden md:block flex-1 max-w-md">
             <div className="relative">
               <input
                 type="text"
                 placeholder="Search leads, conversations..."
-                className="w-full pl-10 pr-4 py-2 rounded-lg bg-white/10 text-white placeholder-gray-400 border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30"
+                className="w-full pl-10 pr-4 py-2 rounded-lg bg-gray-100 text-black placeholder-gray-500 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-black/20"
               />
               <svg
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
@@ -80,11 +89,11 @@ export default function NavbarLayout() {
             {/* 🔔 NOTIFICATION */}
             <div className="relative" ref={dropdownRef}>
               <div
-                className="cursor-pointer"
+                className="cursor-pointer relative"
                 onClick={() => setShowNotifications(!showNotifications)}
               >
                 <svg
-                  className="w-6 h-6 text-gray-300 hover:text-white transition-colors"
+                  className="w-6 h-6 text-gray-600 hover:text-black transition-colors"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="1.8"
@@ -104,7 +113,7 @@ export default function NavbarLayout() {
                 )}
               </div>
 
-              {/* ✅ RESPONSIVE DROPDOWN (FIXED FOR MOBILE) */}
+              {/* DROPDOWN */}
               {showNotifications && (
                 <div
                   className="
@@ -160,9 +169,9 @@ export default function NavbarLayout() {
               )}
             </div>
 
-            {/* 👤 USER INFO */}
+            {/* 👤 USER INFO (Desktop Only) */}
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-medium text-black">
                 Vidhi Bajaj
               </p>
               <p className="text-xs text-gray-400">
@@ -171,7 +180,7 @@ export default function NavbarLayout() {
             </div>
 
             {/* 👤 AVATAR */}
-            <div className="h-9 w-9 rounded-full bg-white text-black flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition-transform duration-200">
+            <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition-transform duration-200">
               VB
             </div>
           </div>
