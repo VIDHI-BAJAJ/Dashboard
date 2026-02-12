@@ -8,8 +8,8 @@ const RevenueCard = () => {
     achievedRevenue: 0,
   });
 
+  const [loading, setLoading] = useState(true);
 
-  
   useEffect(() => {
     fetchRevenue();
   }, []);
@@ -17,15 +17,31 @@ const RevenueCard = () => {
   const fetchRevenue = async () => {
     try {
       const res = await axios.get("/api/revenue-stats");
-      setData(res.data);
+      console.log("Revenue API:", res.data);
+
+      setData({
+        percentage: Number(res.data?.percentage) || 0,
+        achievedRevenue: Number(res.data?.achievedRevenue) || 0,
+      });
+
     } catch (err) {
       console.error("Revenue fetch error:", err);
+      setData({
+        percentage: 0,
+        achievedRevenue: 0,
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Safe values
+  const safeRevenue = Number(data?.achievedRevenue) || 0;
+  const safePercentage = Number(data?.percentage) || 0;
+
   const chartData = [
-    { name: "Achieved", value: data.percentage },
-    { name: "Remaining", value: 100 - data.percentage }
+    { name: "Achieved", value: safePercentage },
+    { name: "Remaining", value: 100 - safePercentage }
   ];
 
   return (
@@ -39,7 +55,7 @@ const RevenueCard = () => {
         </span>
       </div>
 
-      {/* Bigger Chart */}
+      {/* Chart */}
       <div className="relative h-56">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
@@ -60,19 +76,22 @@ const RevenueCard = () => {
 
         {/* Center Value */}
         <div className="absolute inset-0 flex flex-col items-center justify-center mt-14">
-          <h2 className="text-xl font-bold text-black">
-            ₹{Number(data.achievedRevenue).toLocaleString()}
-          </h2>
-          <p className="text-sm text-gray-500">
-            +{data.percentage}%
-          </p>
+          {loading ? (
+            <p className="text-gray-400 text-sm">Loading...</p>
+          ) : (
+            <>
+              <h2 className="text-xl font-bold text-black">
+                ₹{safeRevenue.toLocaleString("en-IN")}
+              </h2>
+              <p className="text-sm text-gray-500">
+                +{safePercentage}%
+              </p>
+            </>
+          )}
         </div>
       </div>
     </div>
   );
 };
-
-
-
 
 export default RevenueCard;
