@@ -56,8 +56,8 @@ const CalendarComponent = ({ events = [] }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-      <div className="flex justify-between items-center mb-3">
-        <h3 className="text-lg font-semibold text-gray-900">Calendar</h3>
+      <div className="flex justify-between mb-3 flex-col sm:flex-col">
+        <h3 className="text-lg font-semibold text-gray-900 mb-2 sm:mb-0">Calendar</h3>
         <div className="flex items-center gap-1 sm:gap-2">
           <button 
             onClick={goToPreviousMonth}
@@ -67,7 +67,7 @@ const CalendarComponent = ({ events = [] }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <span className="text-xs sm:text-sm font-medium text-gray-700 min-w-[80px] sm:min-w-[120px] text-center truncate">
+          <span className="text-xs sm:text-sm font-medium text-gray-700 min-w-[80px] sm:min-w-[120px]  truncate">
             {formatDateHeader(currentDate)}
           </span>
           <button 

@@ -5,6 +5,7 @@ import CalendarComponent from "../components/CalendarComponent";
 import LeadsTable from "../components/LeadsTable";
 import LeadForm from "../components/LeadForm";
 import { generateChartData, generateCalendarEvents } from "../utils/calendarHelper";
+import RevenueCard from "../components/RevenueCard";
 
 export default function Dashboard() {
   const [chartData, setChartData] = useState([]);
@@ -115,21 +116,29 @@ export default function Dashboard() {
       
       {/* Responsive Layout for Leads Overview and Calendar */}
       {/* Mobile: Stack vertically, Tablet: 60/40 split, Desktop: 70/30 split */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mt-8">
-        {/* Leads Overview Chart - 100% on mobile, 60% on tablet, 70% on desktop */}
-        <div className="md:col-span-3">
-          <LeadsOverviewChart 
-            data={chartData} 
-            timeRange={timeRange}
-            onTimeRangeChange={setTimeRange}
-          />
-        </div>
-        
-        {/* Calendar - 100% on mobile, 40% on tablet, 30% on desktop */}
-        <div className="md:col-span-2">
-          <CalendarComponent events={calendarEvents} />
-        </div>
-      </div>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8 items-stretch">
+
+  {/* Revenue */}
+  <div className="lg:col-span-3">
+    <RevenueCard />
+  </div>
+
+  {/* Leads Overview */}
+  <div className="lg:col-span-6">
+    <LeadsOverviewChart 
+      data={chartData} 
+      timeRange={timeRange}
+      onTimeRangeChange={setTimeRange}
+    />
+  </div>
+
+  {/* Calendar */}
+  <div className="lg:col-span-3">
+    <CalendarComponent events={calendarEvents} />
+  </div>
+
+</div>
+
       
       {/* Leads Table Section */}
       <div className="mt-8">
@@ -150,7 +159,7 @@ export default function Dashboard() {
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
   </svg>
 </button>
-    
+
       
       {/* Lead Form Modal */}
       <LeadForm 
