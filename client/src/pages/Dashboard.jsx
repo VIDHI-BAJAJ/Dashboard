@@ -141,15 +141,16 @@ export default function Dashboard() {
       </div>
       
       {/* Fixed Add Lead Button - Bottom Right Corner */}
-      <button
-        onClick={() => setIsFormOpen(true)}
-        className="fixed bottom-6 right-6 bg-gray-900 text-white p-4 rounded-full shadow-xl hover:bg-gray-800 transition-all duration-200 z-50 hover:scale-110"
-        title="Add New Lead"
-      >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-      </button>
+     <button
+  onClick={() => setIsFormOpen(true)}
+  className="fixed bottom-20 sm:bottom-6 right-6 bg-gray-900 text-white p-4 rounded-full shadow-xl hover:bg-gray-800 transition-all duration-200 z-50 hover:scale-110"
+  title="Add New Lead"
+>
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+  </svg>
+</button>
+    
       
       {/* Lead Form Modal */}
       <LeadForm 

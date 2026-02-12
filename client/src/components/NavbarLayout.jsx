@@ -9,6 +9,7 @@ import Listing from "../pages/Listing.jsx";
 import Segmentation from "../pages/Segmentation.jsx";
 import LeadDetails from "../pages/LeadDetails.jsx";
 import ConversationDetails from "../pages/ConversationDetails.jsx";
+import logo from "../images/logo.png";
 
 export default function NavbarLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -55,7 +56,12 @@ export default function NavbarLayout() {
             {/* Logo */}
             {/* Company Name */}
             <span className="text-lg font-semibold text-black tracking-tight">
-              HARBOUR AI
+            <img 
+  src={logo} 
+  alt="Harbour AI Logo"
+  className="h-8 w-auto object-contain"
+/>
+
             </span>
           </div>
 
