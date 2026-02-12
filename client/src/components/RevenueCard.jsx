@@ -57,7 +57,7 @@ const RevenueCard = () => {
         </ResponsiveContainer>
 
         {/* Center Value */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center mt-14">
           <h2 className="text-xl font-bold text-black">
             ₹{Number(data.achievedRevenue).toLocaleString()}
           </h2>
