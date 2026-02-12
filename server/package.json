@@ -21,6 +21,7 @@
     "express": "^5.2.1",
     "mongodb": "^7.1.0",
     "mongoose": "^9.1.6",
+    "package-name": "^0.1.0",
     "selenium-webdriver": "^4.40.0"
   }
 }
