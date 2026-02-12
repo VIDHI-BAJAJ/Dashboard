@@ -8,6 +8,7 @@ const RevenueCard = () => {
     achievedRevenue: 0,
   });
 
+
   
   useEffect(() => {
     fetchRevenue();
