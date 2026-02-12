@@ -9,6 +9,7 @@ const RevenueCard = () => {
   });
 
   const [loading, setLoading] = useState(true);
+const API_URL = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     fetchRevenue();
@@ -16,7 +17,7 @@ const RevenueCard = () => {
 
   const fetchRevenue = async () => {
     try {
-      const res = await axios.get("/api/revenue-stats");
+      const res = await axios.get(`${API_URL}/api/revenue-stats`);
       console.log("Revenue API:", res.data);
 
       setData({
