@@ -85,6 +85,7 @@ app.get("/api/revenue-stats", async (req, res) => {
     console.error("❌ Revenue Stats Error:", err);
     res.status(500).json({ error: "Failed to fetch revenue stats" });
   }
+  
 });
 
 
