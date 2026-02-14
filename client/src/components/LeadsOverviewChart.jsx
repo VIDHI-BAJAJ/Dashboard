@@ -72,7 +72,7 @@ const LeadsOverviewChart = ({ data = [], timeRange = 'this-month', onTimeRangeCh
             dataKey="totalLeads"
             stroke="#111111"
             strokeWidth={2}
-            dot={{ r: 4 }}
+            dot={false}
             activeDot={{ r: 6 }}
           />
         </LineChart>
