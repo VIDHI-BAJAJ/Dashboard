@@ -146,7 +146,7 @@ export default function NavbarLayout() {
             </div>
 
             {/* AVATAR */}
-            <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition">
+            <div className="h-9 w-9 rounded-full bg-[#004f98] text-white flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition">
               VB
             </div>
 

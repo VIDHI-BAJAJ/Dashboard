@@ -153,7 +153,7 @@ export default function Dashboard() {
       {/* Fixed Add Lead Button - Bottom Right Corner */}
      <button
   onClick={() => setIsFormOpen(true)}
-  className="fixed bottom-20 sm:bottom-6 right-6 bg-gray-900 text-white p-4 rounded-full shadow-xl hover:bg-gray-800 transition-all duration-200 z-50 hover:scale-110"
+  className="fixed bottom-20 sm:bottom-6 right-6 bg-[#004f98] text-white p-4 rounded-full shadow-xl hover:bg-gray-800 transition-all duration-200 z-50 hover:scale-110"
   title="Add New Lead"
 >
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

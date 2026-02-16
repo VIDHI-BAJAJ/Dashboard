@@ -62,7 +62,7 @@ function NavIcon({ index, active }) {
 export function BottomNav() {
   return (
     <nav
-      className="lg:hidden fixed inset-x-0 bottom-0 h-16 bg-black border-t border-white/10 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)] z-40"
+      className="lg:hidden fixed inset-x-0 bottom-0 h-16 bg-[#004f98] border-t border-white/10 flex items-center justify-around px-2 pb-[env(safe-area-inset-bottom)] z-40"
     >
       {navItems.map((item, index) => (
         <NavLink
@@ -70,7 +70,7 @@ export function BottomNav() {
           to={item.path}
           className={({ isActive }) =>
             `flex flex-col items-center justify-center text-[11px] font-medium tracking-wide transition-all duration-200 ${
-              isActive ? "text-white" : "text-gray-400 hover:text-gray-200"
+              isActive ? "text-white" : "text-white hover:text-white"
             }`
           }
         >

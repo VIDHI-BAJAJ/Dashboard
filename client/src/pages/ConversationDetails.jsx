@@ -106,68 +106,88 @@ const ConversationDetails = () => {
 
   const firstConversation = contactConversations[0];
 
-  const sendMessage = async () => {
-    if (!newMessage.trim()) return;
+ const sendMessage = async () => {
+  if (!newMessage.trim()) return;
 
-    try {
-      const apiUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:5000";
+  try {
+    const apiUrl =
+      import.meta.env.VITE_API_URL || "http://localhost:5000";
 
-      const messageData = {
-        fields: {
-          Name: firstConversation.fields?.Name,
-          "Message ID": `msg_${Date.now()}`,
-          "WA ID":
-            firstConversation.fields?.["WA ID"] ||
-            firstConversation.fields?.WA_ID,
-          Direction: "Outbound",
-          Channel:
-            firstConversation.fields?.Channel || "WhatsApp",
-          "Message Type": "text",
-          "Body Text": newMessage,
-          Timestamp: new Date().toISOString(),
+    const waId =
+      firstConversation.fields?.["WA ID"] ||
+      firstConversation.fields?.WA_ID;
+
+    // 🔹 1️⃣ Send message to WhatsApp FIRST
+    const whatsappResponse = await fetch(
+      `${apiUrl}/api/send-whatsapp`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          to: waId,
+          message: newMessage,
+        }),
+      }
+    );
+
+    const whatsappData = await whatsappResponse.json();
+
+    if (!whatsappResponse.ok) {
+      alert("Failed to send WhatsApp message");
+      return;
+    }
+
+    // 🔹 2️⃣ Save message to Airtable AFTER WhatsApp success
+    const messageData = {
+      fields: {
+        Name: firstConversation.fields?.Name,
+        "Message ID": `msg_${Date.now()}`,
+        "WA ID": waId,
+        Direction: "Outbound",
+        Channel: "WhatsApp",
+        "Message Type": "text",
+        "Body Text": newMessage,
+        Timestamp: new Date().toISOString(),
+      },
+    };
+
+    const airtableResponse = await fetch(
+      `${apiUrl}/api/conversations`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(messageData),
+      }
+    );
+
+    const responseData = await airtableResponse.json();
+
+    if (airtableResponse.ok) {
+      const newConvEntry = {
+        id: responseData.id,
+        fields: messageData.fields,
+        createdTime: responseData.createdTime,
       };
 
-      const response = await fetch(
-        `${apiUrl}/api/conversations`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(messageData),
-        }
-      );
+      setContactConversations((prev) => [
+        ...prev,
+        newConvEntry,
+      ]);
 
-      const responseData = await response.json();
-
-      if (response.ok) {
-        const newConvEntry = {
-          id: responseData.id,
-          fields: {
-            ...messageData.fields,
-            Direction: "Outbound",
-          },
-          createdTime: responseData.createdTime,
-        };
-
-        setContactConversations((prev) => [
-          ...prev,
-          newConvEntry,
-        ]);
-        setNewMessage("");
-      } else {
-        alert(
-          `Failed to send message: ${
-            responseData.error || "Unknown error"
-          }`
-        );
-      }
-    } catch (err) {
-      alert(`Error sending message: ${err.message}`);
+      setNewMessage("");
+    } else {
+      alert("Message sent to WhatsApp but failed to save in Airtable");
     }
-  };
+
+  } catch (err) {
+    alert(`Error sending message: ${err.message}`);
+  }
+};
+
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -203,9 +223,9 @@ const ConversationDetails = () => {
             {/* Back Button */}
             <button
               onClick={() => navigate("/conversations")}
-              className="px-4 py-2 bg-[#004f98] text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium w-full sm:w-auto"
+              className="px-4 py-2 bg-[#004f98] text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium w-42 sm:w-auto"
             >
-              Back to Conversations
+              Back
             </button>
 
           </div>
@@ -264,7 +284,7 @@ const ConversationDetails = () => {
             <button
               onClick={sendMessage}
               disabled={!newMessage.trim()}
-              className="ml-2 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+              className="ml-2 px-4 py-2 bg-[#004f98] text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               Send
             </button>
