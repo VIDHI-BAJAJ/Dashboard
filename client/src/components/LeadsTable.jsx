@@ -1,17 +1,54 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Edit2, Trash2 } from 'lucide-react';
 
 const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedLeads, setSelectedLeads] = useState(new Set());
+  const [timeFilter, setTimeFilter] = useState('today'); // 'today', 'weekly', 'monthly', 'yearly'
+
+  // Filter leads based on time period
+  const getFilteredLeads = () => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfWeek = new Date(now);
+    startOfWeek.setDate(now.getDate() - now.getDay());
+    startOfWeek.setHours(0, 0, 0, 0);
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+    return leads.filter(lead => {
+      const leadDate = new Date(lead.createdTime || lead.fields?.['Last Message At']);
+      
+      switch (timeFilter) {
+        case 'today':
+          return leadDate >= startOfToday;
+        case 'weekly':
+          return leadDate >= startOfWeek;
+        case 'monthly':
+          return leadDate >= startOfMonth;
+        case 'yearly':
+          return leadDate >= startOfYear;
+        default:
+          return true;
+      }
+    });
+  };
+
+  const filteredLeads = getFilteredLeads();
 
   // Pagination logic
-  const totalPages = Math.ceil(leads.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredLeads.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentLeads = leads.slice(startIndex, endIndex);
+  const currentLeads = filteredLeads.slice(startIndex, endIndex);
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [timeFilter]);
 
   // Handle selecting/deselecting all leads
   const toggleSelectAll = () => {
@@ -23,7 +60,8 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
   };
 
   // Handle individual lead selection
-  const toggleSelectLead = (leadId) => {
+  const toggleSelectLead = (leadId, e) => {
+    e.stopPropagation();
     const newSelected = new Set(selectedLeads);
     if (newSelected.has(leadId)) {
       newSelected.delete(leadId);
@@ -33,28 +71,46 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
     setSelectedLeads(newSelected);
   };
 
-  // Format relative time
-  const formatRelativeTime = (dateString) => {
-    if (!dateString) return '—';
-    
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
-    
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    if (diffInSeconds < 31536000) return `${Math.floor(diffInSeconds / 2592000)}mo ago`;
-    
-    return date.toLocaleDateString();
+  // Navigate to lead detail page
+  const handleRowClick = (leadId) => {
+    navigate(`/leads/${leadId}`);
+  };
+
+  // Handle edit action
+  const handleEdit = (leadId, e) => {
+    e.stopPropagation();
+    navigate(`/leads/${leadId}/edit`);
+  };
+
+  // Handle delete action
+  const handleDelete = (leadId, e) => {
+    e.stopPropagation();
+    // Add your delete logic here
+    console.log('Delete lead:', leadId);
+  };
+
+  // Get status badge color
+  const getStatusColor = (status) => {
+    const statusLower = status?.toLowerCase();
+    switch (statusLower) {
+      case 'active':
+        return 'bg-green-100 text-green-800';
+      case 'inactive':
+        return 'bg-gray-100 text-gray-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'converted':
+        return 'bg-blue-100 text-blue-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
   };
 
   if (loading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
-          <h3 className="text-lg font-semibold text-gray-900">Leads</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Patient Overview</h3>
           <div className="text-sm text-gray-500">Loading...</div>
         </div>
         <div className="space-y-3 sm:space-y-4">
@@ -74,78 +130,165 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      {/* Table Header */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 bg-gray-50">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-          <h3 className="text-lg font-semibold text-gray-900">Leads</h3>
-          <div className="text-sm text-gray-500">
-            {totalCount} total
+      {/* Table Header with Time Filter Tabs */}
+      <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">Patient Overview</h3>
+            <p className="text-sm text-gray-500 mt-1">
+              Lorem ipsum dolor sit amet consectetur sit amet ipsum dolor sit amet consectetur.
+            </p>
+          </div>
+          
+          {/* Time Filter Tabs */}
+          <div className="flex gap-1 bg-gray-100 p-1 rounded-lg">
+            <button
+              onClick={() => setTimeFilter('today')}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                timeFilter === 'today'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Today
+            </button>
+            <button
+              onClick={() => setTimeFilter('weekly')}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                timeFilter === 'weekly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Weekly
+            </button>
+            <button
+              onClick={() => setTimeFilter('monthly')}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                timeFilter === 'monthly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Monthly
+            </button>
+            <button
+              onClick={() => setTimeFilter('yearly')}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium rounded-md transition-colors ${
+                timeFilter === 'yearly'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Yearly
+            </button>
           </div>
         </div>
       </div>
       
-      {/* Responsive Table Container - Scrollable on mobile */}
+      {/* Responsive Table Container */}
       <div className="overflow-x-auto">
         <div className="min-w-full inline-block align-middle">
-          <div className="overflow-hidden border-gray-200">
+          <div className="overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                   Serial No
+                  </th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Name
                   </th>
-                  <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
-                    Phone
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                    Phone number
                   </th>
-                  <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Channel
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                    Email
                   </th>
-                  <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
-                    Last Activity
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
                   </th>
-                  <th scope="col" className="px-4 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
-                    Snippet
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                    Area
+                  </th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">
+                    Intent
+                  </th>
+                  <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Action
                   </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {currentLeads.map((lead, index) => (
-                  <tr 
-                    key={lead.id || index} 
-                    className="hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
-                    onClick={() => navigate(`/leads/${lead.id}`)}
-                  >    
-                    <td className="px-4 sm:px-6 py-3 sm:py-4">
-                      <div className="text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-xs">
-                        {lead.fields?.['Full Name'] || lead.fields?.Name || '—'}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap hidden sm:table-cell">
-                      <div className="text-sm text-gray-700 truncate max-w-[100px]">
-                        {lead.fields?.Phone || '—'}
-                      </div>
-                    </td>
-                    <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                      {lead.fields?.Channel ? (
-                        <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 truncate max-w-[80px] sm:max-w-none">
-                          {lead.fields.Channel}
+                {currentLeads.map((lead, index) => {
+                  const serialNo = String(startIndex + index + 1).padStart(2, '0');
+                  const isSelected = selectedLeads.has(lead.id);
+                  
+                  return (
+                    <tr 
+                      key={lead.id || index} 
+                      className={`hover:bg-gray-50 transition-colors duration-150 cursor-pointer ${
+                        isSelected ? 'bg-blue-50' : ''
+                      }`}
+                      onClick={() => handleRowClick(lead.id)}
+                    >
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {serialNo}
+                      </td>
+                      <td className="px-4 sm:px-6 py-4">
+                        <div className="flex items-center">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">
+                              {lead.fields?.['Full Name'] || lead.fields?.Name || '—'}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden sm:table-cell">
+                        {lead.fields?.Phone || lead.fields?.['Phone Number'] || '—'}
+                      </td>
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden md:table-cell">
+                        {lead.fields?.Email || lead.fields?.['Email address'] || '—'}
+                      </td>
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          getStatusColor(lead.fields?.Status || 'Active')
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${
+                            lead.fields?.Status?.toLowerCase() === 'active' ? 'bg-green-500' : 'bg-gray-400'
+                          }`}></span>
+                          {lead.fields?.Status || 'Active'}
                         </span>
-                      ) : (
-                        <span className="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                          —
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-700 hidden md:table-cell">
-                      {lead.fields?.['Last Message At'] 
-                        ? formatRelativeTime(lead.fields['Last Message At'])
-                        : formatRelativeTime(lead.createdTime)}
-                    </td>
-                    <td className="px-4 sm:px-6 py-3 sm:py-4 text-sm text-gray-500 max-w-[100px] sm:max-w-xs truncate hidden lg:table-cell">
-                      {lead.fields?.['Body Text'] || lead.fields?.Summary || '—'}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-4 sm:px-6 py-4 text-sm text-gray-900 hidden lg:table-cell">
+                        {lead.fields?.Areas && Array.isArray(lead.fields.Areas) 
+                          ? lead.fields.Areas.join(', ') 
+                          : lead.fields?.Area || lead.fields?.Location || '—'}
+                      </td>
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 hidden xl:table-cell">
+                        {lead.fields?.Intent || lead.fields?.['Lead Intent'] || '—'}
+                      </td>
+                      <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={(e) => handleEdit(lead.id, e)}
+                            className="text-gray-600 hover:text-blue-600 transition-colors p-1.5 hover:bg-gray-100 rounded"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => handleDelete(lead.id, e)}
+                            className="text-gray-600 hover:text-red-600 transition-colors p-1.5 hover:bg-gray-100 rounded"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -156,7 +299,7 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
       {totalPages > 1 && (
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="text-xs sm:text-sm text-gray-700 text-center sm:text-left">
-            Showing {startIndex + 1} to {Math.min(endIndex, leads.length)} of {leads.length} results
+            Showing {startIndex + 1} to {Math.min(endIndex, filteredLeads.length)} of {filteredLeads.length} results
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
             <div className="flex items-center gap-2">
@@ -200,7 +343,9 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
 
       {currentLeads.length === 0 && !loading && (
         <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
-          <p className="text-gray-500 text-sm sm:text-base">No leads found</p>
+          <p className="text-gray-500 text-sm sm:text-base">
+            No leads found for {timeFilter === 'today' ? 'today' : timeFilter === 'weekly' ? 'this week' : timeFilter === 'monthly' ? 'this month' : 'this year'}
+          </p>
         </div>
       )}
     </div>

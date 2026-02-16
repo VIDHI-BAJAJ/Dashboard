@@ -1,5 +1,7 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import logo from "../images/logo.png";
+
 
 const navItems = [
   { label: "Dashboard", path: "/dashboard" },
@@ -63,20 +65,18 @@ function NavIcon({ index, active }) {
 export function Sidebar({ collapsed }) {
   return (
     <aside
-      className={`hidden lg:flex fixed inset-y-0 left-0 bg-black text-white border-r border-white/10 transition-[width] duration-300 ${
+      className={`hidden lg:flex fixed inset-y-0 left-0 bg-white text-black border-r border-white/10 transition-[width] duration-300 ${
         collapsed ? "w-20" : "w-60"
       }`}
     >
       <div className="flex flex-col w-full h-full px-4 py-6">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-2 overflow-hidden">
-            <div className="h-8 w-8 rounded-full border border-white/40 flex items-center justify-center text-xs font-semibold tracking-tight">
-              HA
-            </div>
+          
             {!collapsed && (
-              <div className="flex flex-col">
-                <span className="text-xs uppercase tracking-[0.2em] text-gray-400">SaaS</span>
-                <span className="text-sm font-semibold tracking-tight">Harbour AI</span>
+              <div className="flex flex-row ml-4">
+               <img src={logo} alt="Harbour AI Logo" className="h-8 w-auto object-contain"/>
+              {/* <span className="text-sm font-semibold tracking-tight">Harbour AI</span> */}
               </div>
             )}
           </div>
@@ -90,8 +90,8 @@ export function Sidebar({ collapsed }) {
               className={({ isActive }) =>
                 `group flex items-center gap-3 px-3 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
                   isActive
-                    ? "bg-white text-black shadow-sm"
-                    : "text-gray-300 hover:bg-white/10 hover:text-white"
+                    ? "bg-[#004f98] text-white"
+                    : "text-black hover:bg-[#004f98] hover:text-white"
                 }`
               }
             >

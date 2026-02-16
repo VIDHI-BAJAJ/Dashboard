@@ -14,7 +14,6 @@ import logo from "../images/logo.png";
 export default function NavbarLayout() {
   const [collapsed, setCollapsed] = useState(false);
 
-  // 🔔 Notification State
   const [notifications, setNotifications] = useState([
     { id: 1, message: "New lead added: Rohan Sharma", read: false },
     { id: 2, message: "New message from Tanisha Mehta", read: false },
@@ -26,7 +25,6 @@ export default function NavbarLayout() {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -49,23 +47,18 @@ export default function NavbarLayout() {
         }`}
       >
         {/* 🔥 TOP NAVBAR */}
-        <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 bg-white backdrop-blur-sm">
+        <header className="sticky top-0 z-40 flex items-center justify-between px-4 md:px-6 py-3 border-b border-gray-200 bg-white">
 
-          {/* 🔷 LEFT SIDE (Mobile Logo + Name) */}
+          {/* LEFT (Mobile Logo) */}
           <div className="flex items-center gap-2 md:hidden">
-            {/* Logo */}
-            {/* Company Name */}
-            <span className="text-lg font-semibold text-black tracking-tight">
-            <img 
-  src={logo} 
-  alt="Harbour AI Logo"
-  className="h-8 w-auto object-contain"
-/>
-
-            </span>
+            <img
+              src={logo}
+              alt="Harbour AI Logo"
+              className="h-8 w-auto object-contain"
+            />
           </div>
 
-          {/* 🔍 SEARCH (Desktop Only) */}
+          {/* SEARCH (Desktop) */}
           <div className="hidden md:block flex-1 max-w-md">
             <div className="relative">
               <input
@@ -90,7 +83,7 @@ export default function NavbarLayout() {
           </div>
 
           {/* RIGHT SIDE */}
-          <div className="flex items-center gap-4 md:gap-6 ml-auto">
+          <div className="flex items-center gap-5 ml-auto">
 
             {/* 🔔 NOTIFICATION */}
             <div className="relative" ref={dropdownRef}>
@@ -113,82 +106,69 @@ export default function NavbarLayout() {
                 </svg>
 
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] px-1.5 py-0.5 rounded-full">
+                  <span className="absolute -top-1 -right-1 bg-[#004f98] text-white text-[10px] px-1 py-0.5 rounded-full">
                     {unreadCount}
                   </span>
                 )}
               </div>
-
-              {/* DROPDOWN */}
-              {showNotifications && (
-                <div
-                  className="
-                    fixed md:absolute
-                    top-14 md:top-12
-                    left-0 md:left-auto
-                    right-0 md:right-0
-                    w-full md:w-80
-                    bg-white
-                    md:rounded-xl
-                    shadow-xl
-                    border border-gray-200
-                    overflow-hidden
-                    z-50
-                  "
-                >
-                  <div className="px-4 py-3 border-b font-semibold text-gray-800">
-                    Notifications
-                  </div>
-
-                  <div className="max-h-64 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <div className="p-4 text-sm text-gray-500">
-                        No notifications
-                      </div>
-                    ) : (
-                      notifications.map((notif) => (
-                        <div
-                          key={notif.id}
-                          className={`px-4 py-3 text-sm cursor-pointer hover:bg-gray-100 ${
-                            !notif.read ? "bg-gray-50 font-medium" : ""
-                          }`}
-                          onClick={() => {
-                            setNotifications((prev) =>
-                              prev.map((n) =>
-                                n.id === notif.id
-                                  ? { ...n, read: true }
-                                  : n
-                              )
-                            );
-                          }}
-                        >
-                          {notif.message}
-                        </div>
-                      ))
-                    )}
-                  </div>
-
-                  <div className="px-4 py-2 text-center text-xs text-gray-500 border-t">
-                    Click notification to mark as read
-                  </div>
-                </div>
-              )}
             </div>
 
-            {/* 👤 USER INFO (Desktop Only) */}
+            {/* 📩 EMAIL */}
+            <div className="cursor-pointer">
+             <svg
+  xmlns="http://www.w3.org/2000/svg"
+  className="w-5 h-5 text-gray-600"
+  fill="none"
+  viewBox="0 0 24 24"
+  stroke="currentColor"
+  strokeWidth="1.5"
+>
+  <path
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    d="M11.983 5.25c.386-1.162 2.02-1.162 2.406 0a1.724 1.724 0 002.591.977c1.05-.606 2.287.63 1.681 1.681a1.724 1.724 0 00.977 2.591c1.162.386 1.162 2.02 0 2.406a1.724 1.724 0 00-.977 2.591c.606 1.05-.63 2.287-1.681 1.681a1.724 1.724 0 00-2.591.977c-.386 1.162-2.02 1.162-2.406 0a1.724 1.724 0 00-2.591-.977c-1.05.606-2.287-.63-1.681-1.681a1.724 1.724 0 00-.977-2.591c-1.162-.386-1.162-2.02 0-2.406a1.724 1.724 0 00.977-2.591c-.606-1.05.63-2.287 1.681-1.681.997.576 2.256.09 2.591-.977z"
+  />
+  <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
+</svg>
+
+            </div>
+
+            {/* Grey Divider */}
+            <div className="h-6 w-px bg-gray-300 hidden sm:block"></div>
+
+            {/* USER INFO */}
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-black">
                 Vidhi Bajaj
               </p>
-              <p className="text-xs text-gray-400">
-                Admin
+              <p className="text-xs text-gray-500 flex items-center justify-end gap-1">
+                <span className="h-2 w-2 rounded-full bg-green-500"></span>
+                Online
               </p>
             </div>
 
-            {/* 👤 AVATAR */}
-            <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition-transform duration-200">
+            {/* AVATAR */}
+            <div className="h-9 w-9 rounded-full bg-black text-white flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition">
               VB
             </div>
+
+            {/* ⚙️ SETTINGS */}
+            <div className="h-9 w-9 rounded-full border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition">
+              <svg
+                className="w-5 h-5 text-gray-600"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M11.983 5.25c.386-1.162 2.02-1.162 2.406 0a1.724 1.724 0 002.591.977c1.05-.606 2.287.63 1.681 1.681a1.724 1.724 0 00.977 2.591c1.162.386 1.162 2.02 0 2.406a1.724 1.724 0 00-.977 2.591c.606 1.05-.63 2.287-1.681 1.681a1.724 1.724 0 00-2.591.977c-.386 1.162-2.02 1.162-2.406 0a1.724 1.724 0 00-2.591-.977c-1.05.606-2.287-.63-1.681-1.681a1.724 1.724 0 00-.977-2.591c-1.162-.386-1.162-2.02 0-2.406a1.724 1.724 0 00.977-2.591c-.606-1.05.63-2.287 1.681-1.681.997.576 2.256.09 2.591-.977z"
+                />
+              </svg>
+            </div>
+
           </div>
         </header>
 
