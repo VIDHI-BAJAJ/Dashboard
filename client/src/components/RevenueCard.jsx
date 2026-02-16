@@ -70,7 +70,7 @@ const API_URL = import.meta.env.VITE_API_URL;
               paddingAngle={2}
               dataKey="value"
             >
-              <Cell fill="#000000" />
+              <Cell fill="#004f98" />
               <Cell fill="#E5E7EB" />
             </Pie>
           </PieChart>

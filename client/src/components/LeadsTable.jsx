@@ -110,7 +110,7 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-2">
-          <h3 className="text-lg font-semibold text-gray-900">Patient Overview</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Leads Overview</h3>
           <div className="text-sm text-gray-500">Loading...</div>
         </div>
         <div className="space-y-3 sm:space-y-4">
@@ -134,7 +134,7 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
       <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">Patient Overview</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Leads Overview</h3>
             <p className="text-sm text-gray-500 mt-1">
               Lorem ipsum dolor sit amet consectetur sit amet ipsum dolor sit amet consectetur.
             </p>

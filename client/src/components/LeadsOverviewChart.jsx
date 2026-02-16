@@ -26,7 +26,7 @@ const LeadsOverviewChart = ({ data = [], timeRange = 'this-month', onTimeRangeCh
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 h-80">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 h-96">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
         <h3 className="text-lg font-semibold text-gray-900">Leads Overview</h3>
         <div className="flex items-center gap-2 sm:gap-3">
@@ -70,7 +70,7 @@ const LeadsOverviewChart = ({ data = [], timeRange = 'this-month', onTimeRangeCh
           <Line
             type="monotone"
             dataKey="totalLeads"
-            stroke="#111111"
+            stroke="#004f98"
             strokeWidth={2}
             dot={false}
             activeDot={{ r: 6 }}
