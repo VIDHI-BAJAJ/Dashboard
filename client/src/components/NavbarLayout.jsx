@@ -115,21 +115,19 @@ export default function NavbarLayout() {
 
             {/* 📩 EMAIL */}
             <div className="cursor-pointer">
-             <svg
-  xmlns="http://www.w3.org/2000/svg"
-  className="w-5 h-5 text-gray-600"
-  fill="none"
-  viewBox="0 0 24 24"
-  stroke="currentColor"
-  strokeWidth="1.5"
->
-  <path
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    d="M11.983 5.25c.386-1.162 2.02-1.162 2.406 0a1.724 1.724 0 002.591.977c1.05-.606 2.287.63 1.681 1.681a1.724 1.724 0 00.977 2.591c1.162.386 1.162 2.02 0 2.406a1.724 1.724 0 00-.977 2.591c.606 1.05-.63 2.287-1.681 1.681a1.724 1.724 0 00-2.591.977c-.386 1.162-2.02 1.162-2.406 0a1.724 1.724 0 00-2.591-.977c-1.05.606-2.287-.63-1.681-1.681a1.724 1.724 0 00-.977-2.591c-1.162-.386-1.162-2.02 0-2.406a1.724 1.724 0 00.977-2.591c-.606-1.05.63-2.287 1.681-1.681.997.576 2.256.09 2.591-.977z"
-  />
-  <circle cx="12" cy="12" r="3" strokeLinecap="round" strokeLinejoin="round" />
-</svg>
+               <svg
+                className="w-6 h-6 text-gray-600 hover:text-black transition-colors"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 8l9 6 9-6M4 6h16a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2z"
+                />
+              </svg>
 
             </div>
 
