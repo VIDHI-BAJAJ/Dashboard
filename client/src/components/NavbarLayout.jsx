@@ -154,19 +154,10 @@ export default function NavbarLayout() {
 
             {/* ⚙️ SETTINGS */}
             <div className="h-9 w-9 rounded-full border border-gray-200 flex items-center justify-center cursor-pointer hover:bg-gray-100 transition">
-              <svg
-                className="w-5 h-5 text-gray-600"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M11.983 5.25c.386-1.162 2.02-1.162 2.406 0a1.724 1.724 0 002.591.977c1.05-.606 2.287.63 1.681 1.681a1.724 1.724 0 00.977 2.591c1.162.386 1.162 2.02 0 2.406a1.724 1.724 0 00-.977 2.591c.606 1.05-.63 2.287-1.681 1.681a1.724 1.724 0 00-2.591.977c-.386 1.162-2.02 1.162-2.406 0a1.724 1.724 0 00-2.591-.977c-1.05.606-2.287-.63-1.681-1.681a1.724 1.724 0 00-.977-2.591c-1.162-.386-1.162-2.02 0-2.406a1.724 1.724 0 00.977-2.591c-.606-1.05.63-2.287 1.681-1.681.997.576 2.256.09 2.591-.977z"
-                />
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+  <circle cx="12" cy="12" r="3"/>
+</svg>
             </div>
 
           </div>
