@@ -160,10 +160,6 @@ app.post("/api/conversations", async (req, res) => {
   }
 });
 
-/* ===================== WHATSAPP ROUTES ===================== */
-const whatsappRoutes = require("./routes/whatsapp");
-app.use("/api", whatsappRoutes);
-
 
 /* ===================== START SERVER ===================== */
 app.listen(PORT, () => {
