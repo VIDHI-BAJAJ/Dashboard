@@ -1,5 +1,5 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import {  AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer , Tooltip, Legend, } from 'recharts';
 
 const LeadsOverviewChart = ({ data = [], timeRange = 'this-month', onTimeRangeChange = () => {} }) => {
   // Custom tooltip component
@@ -41,42 +41,49 @@ const LeadsOverviewChart = ({ data = [], timeRange = 'this-month', onTimeRangeCh
           </select>
         </div>
       </div>
-      <ResponsiveContainer width="100%" height="80%">
-        <LineChart
-          data={data}
-          margin={{ top: 10, right: 15, left: 0, bottom: 20 }}
-        >
-          <CartesianGrid vertical={false} stroke="#e5e7eb" strokeDasharray="2 2" />
+     <ResponsiveContainer width="100%" height="80%">
+  <AreaChart
+    data={data}
+    margin={{ top: 10, right: 15, left: 0, bottom: 20 }}
+  >
+    <CartesianGrid 
+      vertical={false} 
+      stroke="#e5e7eb" 
+      strokeDasharray="2 2" 
+    />
 
-          <XAxis
-            dataKey="time"
-            tick={{ fontSize: 10, fill: '#6b7280' }}
-            angle={-35}
-            textAnchor="end"
-            height={45}
-            axisLine={false}
-            tickLine={false}
-          />
+    <XAxis
+      dataKey="time"
+      tick={{ fontSize: 10, fill: '#6b7280' }}
+      angle={-35}
+      textAnchor="end"
+      height={45}
+      axisLine={false}
+      tickLine={false}
+    />
 
-          <YAxis
-            width={25}
-            tick={{ fontSize: 10, fill: '#6b7280' }}
-            axisLine={false}
-            tickLine={false}
-          />
+    <YAxis
+      width={25}
+      tick={{ fontSize: 10, fill: '#6b7280' }}
+      axisLine={false}
+      tickLine={false}
+    />
 
-          <Tooltip content={<CustomTooltip />} />
+    <Tooltip content={<CustomTooltip />} />
 
-          <Line
-            type="monotone"
-            dataKey="totalLeads"
-            stroke="#004f98"
-            strokeWidth={2}
-            dot={false}
-            activeDot={{ r: 6 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
+    <Area
+      type="monotone"
+      dataKey="totalLeads"
+      stroke="#004f98"
+      fill="#004f98"
+      fillOpacity={0.15}
+      strokeWidth={2}
+      dot={false}
+      activeDot={{ r: 6 }}
+    />
+  </AreaChart>
+</ResponsiveContainer>
+
     </div>
   );
 };
