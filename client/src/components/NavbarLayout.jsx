@@ -139,7 +139,7 @@ export default function NavbarLayout() {
             {/* USER INFO */}
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-black">
-                User Name
+                User
               </p>
               <p className="text-xs text-gray-500 flex items-center justify-end gap-1">
                 <span className="h-2 w-2 rounded-full bg-green-500"></span>

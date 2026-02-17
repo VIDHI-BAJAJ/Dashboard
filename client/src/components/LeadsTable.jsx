@@ -135,9 +135,9 @@ const LeadsTable = ({ leads = [], loading = false, totalCount = 0 }) => {
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Leads Overview</h3>
-            <p className="text-sm text-gray-500 mt-1">
+            {/* <p className="text-sm text-gray-500 mt-1">
               Lorem ipsum dolor sit amet consectetur sit amet ipsum dolor sit amet consectetur.
-            </p>
+            </p> */}
           </div>
           
           {/* Time Filter Tabs */}
