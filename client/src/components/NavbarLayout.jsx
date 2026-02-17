@@ -139,7 +139,7 @@ export default function NavbarLayout() {
             {/* USER INFO */}
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium text-black">
-                Vidhi Bajaj
+                User Name
               </p>
               <p className="text-xs text-gray-500 flex items-center justify-end gap-1">
                 <span className="h-2 w-2 rounded-full bg-green-500"></span>
@@ -149,7 +149,7 @@ export default function NavbarLayout() {
 
             {/* AVATAR */}
             <div className="h-9 w-9 rounded-full bg-[#004f98] text-white flex items-center justify-center font-semibold cursor-pointer hover:scale-105 transition">
-              VB
+              U
             </div>
 
             {/* ⚙️ SETTINGS */}
