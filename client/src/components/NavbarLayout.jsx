@@ -173,7 +173,7 @@ export default function NavbarLayout() {
               path="/conversations/:conversationId"
               element={<ConversationDetails />}
             />
-            <Route path="/listing" element={<Listing />} />
+            {/* <Route path="/listing" element={<Listing />} /> */}
             <Route path="/segmentation" element={<Segmentation />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

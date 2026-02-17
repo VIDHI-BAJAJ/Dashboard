@@ -13,7 +13,8 @@ app.use(
   })
 );
 
-
+const whatsappRoutes = require("./routes/whatsapp");
+app.use("/api", whatsappRoutes);
 
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
@@ -50,6 +51,9 @@ const fetchTable = async (tableName) => {
     createdTime: r.createdTime,
   }));
 };
+
+
+
 
 /* ===================== GET REVENUE STATS ===================== */
 app.get("/api/revenue-stats", async (req, res) => {
@@ -118,21 +122,21 @@ app.post("/api/leads", async (req, res) => {
 });
 
 /* ===================== OPTIONAL TABLE ROUTES ===================== */
-app.get("/api/tasks", async (req, res) => {
-  try {
-    res.json(await fetchTable("Tasks"));
-  } catch {
-    res.status(500).json({ error: "Failed to fetch Tasks" });
-  }
-});
+// app.get("/api/tasks", async (req, res) => {
+//   try {
+//     res.json(await fetchTable("Tasks"));
+//   } catch {
+//     res.status(500).json({ error: "Failed to fetch Tasks" });
+//   }
+// });
 
-app.get("/api/deals", async (req, res) => {
-  try {
-    res.json(await fetchTable("Deals"));
-  } catch {
-    res.status(500).json({ error: "Failed to fetch Deals" });
-  }
-});
+// app.get("/api/deals", async (req, res) => {
+//   try {
+//     res.json(await fetchTable("Deals"));
+//   } catch {
+//     res.status(500).json({ error: "Failed to fetch Deals" });
+//   }
+// });
 
 app.get("/api/conversations", async (req, res) => {
   try {
@@ -157,6 +161,46 @@ app.post("/api/conversations", async (req, res) => {
     console.error("❌ Create Conversation Error:", err.response ? err.response.data : err.message);   
 
     res.status(500).json({ error: "Failed to create conversation" });
+  }
+});
+
+app.get("/api/leads/segmentation", async (req, res) => {
+  try {
+
+    const response = await axios.get(AIRTABLE_URL, {
+      headers: {
+        Authorization: `Bearer ${process.env.AIRTABLE_API_KEY}`
+      }
+    });
+
+    const leads = response.data.records;
+
+    let hot = 0;
+    let warm = 0;
+    let cold31to60 = 0;
+    let cold0to30 = 0;
+
+    leads.forEach((lead) => {
+      const score = lead.fields?.["Lead Score (0–100)"];
+
+      if (!score) return;
+
+      if (score >= 81) hot++;
+      else if (score >= 61) warm++;
+      else if (score >= 31) cold31to60++;
+      else cold0to30++;
+    });
+
+    res.json({
+      hot,
+      warm,
+      cold31to60,
+      cold0to30
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
   }
 });
 

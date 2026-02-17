@@ -106,18 +106,29 @@ const ConversationDetails = () => {
 
   const firstConversation = contactConversations[0];
 
- const sendMessage = async () => {
+  const sendMessage = async () => {
   if (!newMessage.trim()) return;
 
   try {
-    const apiUrl =
-      import.meta.env.VITE_API_URL || "http://localhost:5000";
+    const apiUrl = import.meta.env.VITE_API_URL;
+
+    if (!apiUrl) {
+      alert("API URL not configured");
+      return;
+    }
 
     const waId =
       firstConversation.fields?.["WA ID"] ||
       firstConversation.fields?.WA_ID;
 
-    // 🔹 1️⃣ Send message to WhatsApp FIRST
+    if (!waId) {
+      alert("WA ID not found");
+      return;
+    }
+
+    console.log("Sending to:", `${apiUrl}/api/send-whatsapp`);
+
+    // ✅ Send to WhatsApp
     const whatsappResponse = await fetch(
       `${apiUrl}/api/send-whatsapp`,
       {
@@ -132,14 +143,17 @@ const ConversationDetails = () => {
       }
     );
 
-    const whatsappData = await whatsappResponse.json();
-
     if (!whatsappResponse.ok) {
+      const errorText = await whatsappResponse.text();
+      console.error("WhatsApp Error:", errorText);
       alert("Failed to send WhatsApp message");
       return;
     }
 
-    // 🔹 2️⃣ Save message to Airtable AFTER WhatsApp success
+    const whatsappData = await whatsappResponse.json();
+    console.log("WhatsApp success:", whatsappData);
+
+    // ✅ Save to Airtable
     const messageData = {
       fields: {
         Name: firstConversation.fields?.Name,
@@ -164,26 +178,26 @@ const ConversationDetails = () => {
       }
     );
 
-    const responseData = await airtableResponse.json();
-
-    if (airtableResponse.ok) {
-      const newConvEntry = {
-        id: responseData.id,
-        fields: messageData.fields,
-        createdTime: responseData.createdTime,
-      };
-
-      setContactConversations((prev) => [
-        ...prev,
-        newConvEntry,
-      ]);
-
-      setNewMessage("");
-    } else {
-      alert("Message sent to WhatsApp but failed to save in Airtable");
+    if (!airtableResponse.ok) {
+      const errorText = await airtableResponse.text();
+      console.error("Airtable Error:", errorText);
+      alert("Sent to WhatsApp but failed to save");
+      return;
     }
 
+    const responseData = await airtableResponse.json();
+
+    const newConvEntry = {
+      id: responseData.id,
+      fields: messageData.fields,
+      createdTime: responseData.createdTime,
+    };
+
+    setContactConversations((prev) => [...prev, newConvEntry]);
+    setNewMessage("");
+
   } catch (err) {
+    console.error(err);
     alert(`Error sending message: ${err.message}`);
   }
 };
