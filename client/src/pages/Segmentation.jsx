@@ -99,29 +99,31 @@ export default function Segmentation() {
         {/* Clickable Legend */}
         <div className="grid grid-cols-3 gap-3 sm:gap-4 mt-6 sm:mt-8 text-center">
 
-          <div
-            onClick={() => navigate("/segmentation/hot")}
-            className="rounded-xl py-2 sm:py-3 text-white font-medium cursor-pointer hover:scale-105 transition"
-            style={{ backgroundColor: "#004f98" }}
-          >
-            Hot
-          </div>
+<div
+  onClick={() => navigate("/segmentation/hot")}
+  className="rounded-xl py-2 sm:py-3 text-white font-medium cursor-pointer hover:scale-105 transition"
+  style={{ backgroundColor: "#004f98" }}
+>
+  Hot
+</div>
 
-          <div
-            onClick={() => navigate("/segmentation/warm")}
-            className="rounded-xl py-2 sm:py-3 text-white font-medium cursor-pointer hover:scale-105 transition"
-            style={{ backgroundColor: "#2b6cb0" }}
-          >
-            Warm
-          </div>
+<div
+  onClick={() => navigate("/segmentation/warm")}
+  className="rounded-xl py-2 sm:py-3 text-white font-medium cursor-pointer hover:scale-105 transition"
+  style={{ backgroundColor: "#2b6cb0" }}
+>
+  Warm
+</div>
 
-          <div
-            onClick={() => navigate("/segmentation/cold")}
-            className="rounded-xl py-2 sm:py-3 text-white font-medium cursor-pointer hover:scale-105 transition"
-            style={{ backgroundColor: "#63a4ff" }}
-          >
-            Cold
-          </div>
+<div
+  onClick={() => navigate("/segmentation/cold")}
+  className="rounded-xl py-2 sm:py-3 text-white font-medium cursor-pointer hover:scale-105 transition"
+  style={{ backgroundColor: "#63a4ff" }}
+>
+  Cold
+</div>
+
+
 
         </div>
 
