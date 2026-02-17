@@ -150,6 +150,7 @@ export const generateChartData = (leads = [], timeRange = "this-month") => {
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
+  const todayDate = today.getDate();
 
   let grouped = {};
 
@@ -183,11 +184,10 @@ export const generateChartData = (leads = [], timeRange = "this-month") => {
     }));
   }
 
-  // ---------- MONTH VIEW (ALL DAYS OF CURRENT MONTH) ----------
+  // ---------- MONTH VIEW (ONLY TILL TODAY) ----------
   if (timeRange === "this-month") {
-    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-
-    for (let i = 1; i <= daysInMonth; i++) {
+    // Initialize days from 1 → today only
+    for (let i = 1; i <= todayDate; i++) {
       grouped[i] = 0;
     }
 
@@ -199,7 +199,8 @@ export const generateChartData = (leads = [], timeRange = "this-month") => {
 
       if (
         dateObj.getFullYear() === currentYear &&
-        dateObj.getMonth() === currentMonth
+        dateObj.getMonth() === currentMonth &&
+        dateObj.getDate() <= todayDate
       ) {
         grouped[dateObj.getDate()] += 1;
       }
@@ -215,7 +216,13 @@ export const generateChartData = (leads = [], timeRange = "this-month") => {
   if (timeRange === "this-week") {
     const firstDayOfWeek = new Date(today);
     firstDayOfWeek.setDate(today.getDate() - today.getDay());
+    firstDayOfWeek.setHours(0, 0, 0, 0);
 
+    const lastDayOfWeek = new Date(firstDayOfWeek);
+    lastDayOfWeek.setDate(firstDayOfWeek.getDate() + 6);
+    lastDayOfWeek.setHours(23, 59, 59, 999);
+
+    // Initialize 7 days
     for (let i = 0; i < 7; i++) {
       const d = new Date(firstDayOfWeek);
       d.setDate(firstDayOfWeek.getDate() + i);
@@ -233,11 +240,7 @@ export const generateChartData = (leads = [], timeRange = "this-month") => {
 
       const dateObj = new Date(nextDate);
 
-      const start = new Date(firstDayOfWeek);
-      const end = new Date(firstDayOfWeek);
-      end.setDate(start.getDate() + 6);
-
-      if (dateObj >= start && dateObj <= end) {
+      if (dateObj >= firstDayOfWeek && dateObj <= lastDayOfWeek) {
         const label = dateObj.toLocaleDateString("en-IN", {
           weekday: "short",
         });
