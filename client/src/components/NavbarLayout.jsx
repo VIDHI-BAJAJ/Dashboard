@@ -10,6 +10,8 @@ import Segmentation from "../pages/Segmentation.jsx";
 import LeadDetails from "../pages/LeadDetails.jsx";
 import ConversationDetails from "../pages/ConversationDetails.jsx";
 import logo from "../images/logo.png";
+import SegmentationDetails from "../pages/SegmentationDetails";
+
 
 export default function NavbarLayout() {
   const [collapsed, setCollapsed] = useState(false);
@@ -175,6 +177,8 @@ export default function NavbarLayout() {
             />
             {/* <Route path="/listing" element={<Listing />} /> */}
             <Route path="/segmentation" element={<Segmentation />} />
+            
+<Route path="/segmentation/:segment" element={<SegmentationDetails />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>
