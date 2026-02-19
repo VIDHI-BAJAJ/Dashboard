@@ -66,10 +66,10 @@ export default function Segmentation() {
       setColdLeads(coldArr);
 
       setChartData([
-        { label: "100 - 80", value: s1, color: "#1e3a8a" },
-        { label: "80 - 60", value: s2, color: "#2563eb" },
-        { label: "60 - 30", value: s3, color: "#60a5fa" },
-        { label: "30 - 0", value: s4, color: "#60a5fa" }
+        { label: "100 - 80", value: s1, color: "bg-gradient-to-r from-[#0f4c8a] to-[#1e6fd9]" },
+        { label: "80 - 60", value: s2, color: "bg-gradient-to-r from-[#155a9c] to-[#3b82f6]" },
+        { label: "60 - 30", value: s3, color: "bg-gradient-to-r from-[#1e6fd9] to-[#60a5fa]" },
+        { label: "30 - 0", value: s4,  color: "bg-gradient-to-r from-[#1e6fd9] to-[#60a5fa]" }
       ]);
 
     } catch (error) {
@@ -140,9 +140,7 @@ export default function Segmentation() {
     style: { fontSize: 14 }
   }}
 />
-
         <Tooltip />
-
         {/* Responsive Bar Size */}
         <Bar
           dataKey="value"
@@ -158,91 +156,13 @@ export default function Segmentation() {
   </div>
 </div>
 
-
-      {/* 3 CARDS */}
-      {/* <div className="flex flex-col md:flex-row gap-6 justify-center mt-12">
-
-        <div
-          onClick={() => navigate("/segmentation/hot")}
-          className="w-full md:w-1/3 border rounded-xl shadow-md cursor-pointer hover:shadow-lg transition"
-        >
-          <div className="bg-blue-900 text-white text-center py-3 font-semibold rounded-t-xl">
-            Hot ({hotLeads.length})
-          </div>
-
-          <div className="p-4">
-            {hotLeads.slice(0, 10).map((lead, index) => (
-              <div key={lead.id} className="border-b py-1  text-gray-700 text-xs sm:text-sm uppercase">
-                {index + 1}. {lead.fields?.["Full Name"]}
-              </div>
-            ))}
-
-            {hotLeads.length > 10 && (
-              <div className="text-blue-600 text-sm mt-2">
-                + {hotLeads.length - 10} more...
-              </div>
-            )}
-          </div>
-        </div>
-
-
-        <div
-          onClick={() => navigate("/segmentation/warm")}
-          className="w-full md:w-1/3 border rounded-xl shadow-md cursor-pointer hover:shadow-lg transition"
-        >
-          <div className="bg-blue-700 text-white text-center py-3 font-semibold rounded-t-xl">
-            Warm ({warmLeads.length})
-          </div>
-
-          <div className="p-4">
-            {warmLeads.slice(0, 10).map((lead, index) => (
-              <div key={lead.id} className="border-b py-1 text-gray-700 text-xs sm:text-sm uppercase">
-                {index + 1}. {lead.fields?.["Full Name"]}
-              </div>
-            ))}
-
-            {warmLeads.length > 10 && (
-              <div className="text-blue-600 text-sm mt-2">
-                + {warmLeads.length - 10} more...
-              </div>
-            )}
-          </div>
-        </div>
-
-        
-        <div
-          onClick={() => navigate("/segmentation/cold")}
-          className="w-full md:w-1/3 border rounded-xl shadow-md cursor-pointer hover:shadow-lg transition"
-        >
-          <div className="bg-blue-400 text-white text-center py-3 font-semibold rounded-t-xl">
-            Cold ({coldLeads.length})
-          </div>
-
-          <div className="p-4">
-            {coldLeads.slice(0, 10).map((lead, index) => (
-              <div key={lead.id} className="border-b py-1 text-gray-700 text-xs sm:text-sm uppercase">
-                {index + 1}. {lead.fields?.["Full Name"]}
-              </div>
-            ))}
-
-            {coldLeads.length > 10 && (
-              <div className="text-blue-600 text-sm mt-2">
-                + {coldLeads.length - 10} more...
-              </div>
-            )}
-          </div>
-        </div>
-
-      </div> */}
-
-
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
 
 {/* CARD COMPONENT */}
 {[
-  { title: "Hot", count: hotLeads.length, data: hotLeads, color: "bg-blue-900" },
-  { title: "Warm", count: warmLeads.length, data: warmLeads, color: "bg-blue-700" },
-  { title: "Cold", count: coldLeads.length, data: coldLeads, color: "bg-blue-500" }
+  { title: "Hot", count: hotLeads.length, data: hotLeads,   color: "bg-gradient-to-r from-[#0f4c8a] to-[#1e6fd9]" },
+  { title: "Warm", count: warmLeads.length, data: warmLeads, color: "bg-gradient-to-r from-[#155a9c] to-[#3b82f6]" },
+  { title: "Cold", count: coldLeads.length, data: coldLeads, color: "bg-gradient-to-r from-[#1e6fd9] to-[#60a5fa]" }
 ].map((segment, idx) => (
 
   <div
@@ -258,31 +178,58 @@ export default function Segmentation() {
       </h3>
     </div>
 
-    {/* Body */}
-    <div >
+ {/* Body */}
+<div className="overflow-hidden">
+  <table className="min-w-full">
 
-      {segment.data.slice(0, 10).map((lead, index) => (
-        <div
-          key={index}
-          className="flex items-center justify-between py-2 border-b border-gray-200 last:border-none pl-4"
+    {/* Table Header */}
+    <thead className="bg-gray-50 border-b border-gray-200">
+      <tr>
+        <th
+          scope="col"
+          className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider w-30"
         >
-          <span className="text-xs text-gray-400 w-6">
+          Serial No
+        </th>
+
+        <th
+          scope="col"
+          className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider"
+        >
+          Name
+        </th>
+      </tr>
+    </thead>
+
+    {/* Table Body */}
+    <tbody className="bg-white divide-y divide-gray-100">
+      {segment.data.slice(0, 10).map((lead, index) => (
+        <tr
+          key={index}
+          className="hover:bg-gray-50 transition"
+        >
+          <td className="px-6 py-3 text-sm text-gray-400">
             {index + 1}.
-          </span>
+          </td>
 
-          <span className="flex-1 text-sm text-gray-700 font-medium truncate">
+          <td className="px-6 py-3 text-sm text-gray-800 font-medium">
             {lead.fields?.["Full Name"]}
-          </span>
-        </div>
+          </td>
+        </tr>
       ))}
+    </tbody>
 
-      {segment.count > 10 && (
-        <div className="mt-3 text-sm text-blue-600 font-medium pl-4 pb-5">
-          + {segment.count - 10} more...
-        </div>
-      )}
+  </table>
 
+  {/* More Count */}
+  {segment.count > 10 && (
+    <div className="px-6 py-4 text-sm text-blue-600 font-medium">
+      + {segment.count - 10} more...
     </div>
+  )}
+</div>
+
+
   </div>
 
 ))}
