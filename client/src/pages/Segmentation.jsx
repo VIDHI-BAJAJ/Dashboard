@@ -160,9 +160,8 @@ export default function Segmentation() {
 
 
       {/* 3 CARDS */}
-      <div className="flex flex-col md:flex-row gap-6 justify-center mt-12">
+      {/* <div className="flex flex-col md:flex-row gap-6 justify-center mt-12">
 
-        {/* HOT */}
         <div
           onClick={() => navigate("/segmentation/hot")}
           className="w-full md:w-1/3 border rounded-xl shadow-md cursor-pointer hover:shadow-lg transition"
@@ -186,7 +185,7 @@ export default function Segmentation() {
           </div>
         </div>
 
-        {/* WARM */}
+
         <div
           onClick={() => navigate("/segmentation/warm")}
           className="w-full md:w-1/3 border rounded-xl shadow-md cursor-pointer hover:shadow-lg transition"
@@ -210,7 +209,7 @@ export default function Segmentation() {
           </div>
         </div>
 
-        {/* COLD */}
+        
         <div
           onClick={() => navigate("/segmentation/cold")}
           className="w-full md:w-1/3 border rounded-xl shadow-md cursor-pointer hover:shadow-lg transition"
@@ -234,7 +233,62 @@ export default function Segmentation() {
           </div>
         </div>
 
-      </div>
+      </div> */}
+
+
+<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+
+{/* CARD COMPONENT */}
+{[
+  { title: "Hot", count: hotLeads.length, data: hotLeads, color: "bg-blue-900" },
+  { title: "Warm", count: warmLeads.length, data: warmLeads, color: "bg-blue-700" },
+  { title: "Cold", count: coldLeads.length, data: coldLeads, color: "bg-blue-500" }
+].map((segment, idx) => (
+
+  <div
+    key={idx}
+    onClick={() => navigate(`/segmentation/${segment.title.toLowerCase()}`)}
+    className="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition cursor-pointer"
+  >
+
+    {/* Header */}
+    <div className={`${segment.color} text-white px-12 py-6 rounded-t-2xl`}>
+      <h3 className="text-sm font-semibold tracking-wide">
+        {segment.title} ({segment.count})
+      </h3>
+    </div>
+
+    {/* Body */}
+    <div >
+
+      {segment.data.slice(0, 10).map((lead, index) => (
+        <div
+          key={index}
+          className="flex items-center justify-between py-2 border-b border-gray-200 last:border-none pl-4"
+        >
+          <span className="text-xs text-gray-400 w-6">
+            {index + 1}.
+          </span>
+
+          <span className="flex-1 text-sm text-gray-700 font-medium truncate">
+            {lead.fields?.["Full Name"]}
+          </span>
+        </div>
+      ))}
+
+      {segment.count > 10 && (
+        <div className="mt-3 text-sm text-blue-600 font-medium pl-4 pb-5">
+          + {segment.count - 10} more...
+        </div>
+      )}
+
+    </div>
+  </div>
+
+))}
+
+</div>
+
     </div>
   );
 }

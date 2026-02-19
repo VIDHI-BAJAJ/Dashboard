@@ -11,3 +11,8 @@ body {
 	overflow-y: auto;
 	overflow-x: hidden;
 }
+
+.scroll-container {
+	-webkit-overflow-scrolling: touch;
+  }
+  
