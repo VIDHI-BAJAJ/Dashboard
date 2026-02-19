@@ -173,8 +173,8 @@ export default function Segmentation() {
 
     {/* Header */}
     <div className={`${segment.color} text-white px-12 py-6 rounded-t-2xl`}>
-      <h3 className="text-sm font-semibold tracking-wide">
-        {segment.title} ({segment.count})
+      <h3 className="text-lg font-semibold tracking-wide text-center">
+        {segment.title}
       </h3>
     </div>
 
