@@ -66,10 +66,10 @@ export default function Segmentation() {
       setColdLeads(coldArr);
 
       setChartData([
-        { label: "100 - 80", value: s1, color: "bg-gradient-to-r from-[#0f4c8a] to-[#1e6fd9]" },
-        { label: "80 - 60", value: s2, color: "bg-gradient-to-r from-[#155a9c] to-[#3b82f6]" },
-        { label: "60 - 30", value: s3, color: "bg-gradient-to-r from-[#1e6fd9] to-[#60a5fa]" },
-        { label: "30 - 0", value: s4,  color: "bg-gradient-to-r from-[#1e6fd9] to-[#60a5fa]" }
+        { label: "100 - 80", value: s1, color: "#1e3a8a" },
+        { label: "80 - 60", value: s2, color: "#2563eb" },
+        { label: "60 - 30", value: s3, color: "#60a5fa" },
+        { label: "30 - 0", value: s4, color: "#60a5fa" }
       ]);
 
     } catch (error) {
