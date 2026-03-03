@@ -11,6 +11,8 @@ import LeadDetails from "../pages/LeadDetails.jsx";
 import ConversationDetails from "../pages/ConversationDetails.jsx";
 import logo from "../images/logo.png";
 import SegmentationDetails from "../pages/SegmentationDetails";
+import AiInsights from "../pages/AiInsights.jsx";
+import AddListing from "../components/AddListing.jsx";
 
 
 export default function NavbarLayout() {
@@ -175,9 +177,10 @@ export default function NavbarLayout() {
               path="/conversations/:conversationId"
               element={<ConversationDetails />}
             />
-            {/* <Route path="/listing" element={<Listing />} /> */}
+            <Route path="/listings/add" element={<AddListing />} />
+            <Route path="/listing" element={<Listing />} />
             <Route path="/segmentation" element={<Segmentation />} />
-            
+            <Route path="/ai-insights" element={<AiInsights />} />
 <Route path="/segmentation/:segment" element={<SegmentationDetails />} />
             <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Routes>

@@ -7,9 +7,9 @@ const navItems = [
   { label: "Dashboard", path: "/dashboard" },
   { label: "Leads", path: "/leads" },
   { label: "Conversations", path: "/conversations" },
-  // { label: "Listing", path: "/listing" },
+  { label: "Listing", path: "/listing" },
   { label: "Segmentation", path: "/segmentation" },
-  // { label: "Ai Insights", path: "/ai-insights" },
+  { label: "Ai Insights", path: "/ai-insights" },
 ];
 
 function NavIcon({ index, active }) {

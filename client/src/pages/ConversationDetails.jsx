@@ -9,6 +9,25 @@ const ConversationDetails = () => {
   const [error, setError] = useState(null);
   const [newMessage, setNewMessage] = useState("");
 
+  // ✅ Normalize phone numbers (India logic)
+  const normalizeNumber = (num) => {
+    if (!num) return "";
+
+    let cleaned = num.toString().replace(/\D/g, "");
+
+    // Remove leading 0
+    if (cleaned.startsWith("0")) {
+      cleaned = cleaned.substring(1);
+    }
+
+    // If 10 digits, add 91
+    if (cleaned.length === 10) {
+      cleaned = "91" + cleaned;
+    }
+
+    return cleaned;
+  };
+
   useEffect(() => {
     const fetchConversations = async () => {
       try {
@@ -21,19 +40,21 @@ const ConversationDetails = () => {
 
         const allConversations = await response.json();
 
-        // Filter ONLY by Name
-        const filteredConversations = allConversations.filter(
-          (c) => c.fields?.Name === conversationId
-        );
+        const urlWaId = normalizeNumber(conversationId);
+
+        // ✅ Filter using normalized WA ID
+        const filteredConversations = allConversations.filter((c) => {
+          const recordWaId = normalizeNumber(
+            c.fields?.["WA ID"] || c.fields?.WA_ID
+          );
+
+          return recordWaId === urlWaId;
+        });
 
         // Sort oldest → newest
         filteredConversations.sort((a, b) => {
-          const dateA = new Date(
-            a.fields?.Timestamp || a.createdTime
-          );
-          const dateB = new Date(
-            b.fields?.Timestamp || b.createdTime
-          );
+          const dateA = new Date(a.createdTime);
+          const dateB = new Date(b.createdTime);
           return dateA - dateB;
         });
 
@@ -57,6 +78,101 @@ const ConversationDetails = () => {
       hour12: true,
       timeZone: "Asia/Kolkata",
     });
+  };
+
+  const sendMessage = async () => {
+    if (!newMessage.trim()) return;
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+
+      if (!apiUrl) {
+        alert("API URL not configured");
+        return;
+      }
+
+      const rawWaId =
+        contactConversations[0]?.fields?.["WA ID"] ||
+        contactConversations[0]?.fields?.WA_ID;
+
+      const waId = normalizeNumber(rawWaId);
+
+      if (!waId) {
+        alert("WA ID not found");
+        return;
+      }
+
+      // ✅ Send to WhatsApp
+      const whatsappResponse = await fetch(
+        `${apiUrl}/api/send-whatsapp`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            to: waId,
+            message: newMessage,
+          }),
+        }
+      );
+
+      const whatsappData = await whatsappResponse.json();
+      console.log("WhatsApp API response:", whatsappData);
+
+      if (!whatsappResponse.ok || whatsappData.error) {
+        alert("WhatsApp sending failed");
+        return;
+      }
+
+      // ✅ Save to Airtable
+      const messageData = {
+        fields: {
+          Name: contactConversations[0]?.fields?.Name,
+          "Message ID": `msg_${Date.now()}`,
+          "WA ID": waId,
+          Direction: "Outbound",
+          Channel: "WhatsApp",
+          "Message Type": "text",
+          "Body Text": newMessage,
+          Timestamp: new Date().toISOString(),
+        },
+      };
+
+      const airtableResponse = await fetch(
+        `${apiUrl}/api/conversations`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(messageData),
+        }
+      );
+
+      if (!airtableResponse.ok) {
+        alert("Sent to WhatsApp but failed to save");
+        return;
+      }
+
+      const responseData = await airtableResponse.json();
+
+      const newConvEntry = {
+        id: responseData.id,
+        fields: messageData.fields,
+        createdTime: responseData.createdTime,
+      };
+
+      setContactConversations((prev) => [...prev, newConvEntry]);
+      setNewMessage("");
+
+    } catch (err) {
+      console.error(err);
+      alert(`Error sending message: ${err.message}`);
+    }
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
   };
 
   if (loading) {
@@ -106,142 +222,32 @@ const ConversationDetails = () => {
 
   const firstConversation = contactConversations[0];
 
-  const sendMessage = async () => {
-  if (!newMessage.trim()) return;
-
-  try {
-    const apiUrl = import.meta.env.VITE_API_URL;
-
-    if (!apiUrl) {
-      alert("API URL not configured");
-      return;
-    }
-
-    const waId =
-      firstConversation.fields?.["WA ID"] ||
-      firstConversation.fields?.WA_ID;
-
-    if (!waId) {
-      alert("WA ID not found");
-      return;
-    }
-
-    console.log("Sending to:", `${apiUrl}/api/send-whatsapp`);
-
-    // ✅ Send to WhatsApp
-    const whatsappResponse = await fetch(
-      `${apiUrl}/api/send-whatsapp`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          to: waId,
-          message: newMessage,
-        }),
-      }
-    );
-
-    if (!whatsappResponse.ok) {
-      const errorText = await whatsappResponse.text();
-      console.error("WhatsApp Error:", errorText);
-      alert("Failed to send WhatsApp message");
-      return;
-    }
-
-    const whatsappData = await whatsappResponse.json();
-    console.log("WhatsApp success:", whatsappData);
-
-    // ✅ Save to Airtable
-    const messageData = {
-      fields: {
-        Name: firstConversation.fields?.Name,
-        "Message ID": `msg_${Date.now()}`,
-        "WA ID": waId,
-        Direction: "Outbound",
-        Channel: "WhatsApp",
-        "Message Type": "text",
-        "Body Text": newMessage,
-        Timestamp: new Date().toISOString(),
-      },
-    };
-
-    const airtableResponse = await fetch(
-      `${apiUrl}/api/conversations`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(messageData),
-      }
-    );
-
-    if (!airtableResponse.ok) {
-      const errorText = await airtableResponse.text();
-      console.error("Airtable Error:", errorText);
-      alert("Sent to WhatsApp but failed to save");
-      return;
-    }
-
-    const responseData = await airtableResponse.json();
-
-    const newConvEntry = {
-      id: responseData.id,
-      fields: messageData.fields,
-      createdTime: responseData.createdTime,
-    };
-
-    setContactConversations((prev) => [...prev, newConvEntry]);
-    setNewMessage("");
-
-  } catch (err) {
-    console.error(err);
-    alert(`Error sending message: ${err.message}`);
-  }
-};
-
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
-    }
-  };
-
   return (
     <div className="min-h-screen bg-white flex flex-col">
 
-      {/* 🔥 RESPONSIVE HEADER */}
+      {/* HEADER */}
       <div className="border-b border-gray-200 bg-white sticky top-0 z-10">
         <div className="px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-
-            {/* Contact Info */}
             <div>
               <h1 className="text-xl font-semibold text-gray-900">
-                {firstConversation.fields?.Name ||
-                  "Conversation"}
+                {firstConversation.fields?.Name || "Conversation"}
               </h1>
               <p className="text-sm text-gray-500">
-                {firstConversation.fields?.Channel ||
-                  "Channel"}{" "}
-                •{" "}
-                {firstConversation.fields?.["WA ID"] ||
-                  firstConversation.fields?.WA_ID ||
-                  "Contact"}
+                {firstConversation.fields?.Channel || "Channel"} •{" "}
+                {normalizeNumber(
+                  firstConversation.fields?.["WA ID"] ||
+                  firstConversation.fields?.WA_ID
+                )}
               </p>
             </div>
 
-            {/* Back Button */}
             <button
               onClick={() => navigate("/conversations")}
               className="px-4 py-2 bg-[#004f98] text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium w-42 sm:w-auto"
             >
               Back
             </button>
-
           </div>
         </div>
       </div>
@@ -269,7 +275,7 @@ const ConversationDetails = () => {
                   {conv.fields?.["Body Text"]}
                 </div>
                 <div className="text-xs opacity-70 mt-1 text-right">
-                  {formatTime(conv.fields?.Timestamp)}
+                {formatTime(conv.fields?.Timestamp, conv.createdTime)}
                   <span className="ml-2">
                     {conv.fields?.Direction === "Outbound"
                       ? "→ Sent"

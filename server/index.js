@@ -1,18 +1,43 @@
 const express = require("express");
 const axios = require("axios");
 const cors = require("cors");
+const mongoose = require("mongoose");
 require("dotenv").config();
+const listingRoutes = require("./routes/listingRoutes.jsx");
+
 
 const app = express();
 app.use(express.json());
 app.use(
   cors({
     origin: "*", // restrict later in prod
-    methods: ["GET", "POST"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
+
+
+// 50mb limit to handle base64 photo payloads
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
+
+// ── Routes ─────────────────────────────────────────────────────────
+app.use("/api/listings", listingRoutes);
+
+
+
+// ── Connect DB → Start Server ──────────────────────────────────────
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ MongoDB Atlas Connected");
+  } catch (error) {
+    console.error("❌ MongoDB connection failed:", error.message);
+    process.exit(1);
+  }
+};
+connectDB()
 
 /* ===================== CONFIG ===================== */
 const PORT = process.env.PORT || 5000;
@@ -202,6 +227,53 @@ app.get("/api/leads/segmentation", async (req, res) => {
   }
 });
 
+// app.post("/api/send-whatsapp", async (req, res) => {
+//   try {
+//     const { to, message } = req.body;
+
+//     if (!to || !message) {
+//       return res.status(400).json({
+//         success: false,
+//         error: "Phone number and message are required",
+//       });
+//     }
+
+//     console.log("Sending WhatsApp message to:", to);
+
+//     const response = await axios.post(
+//       `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
+//       {
+//         messaging_product: "whatsapp",
+//         to: to,
+//         type: "text",
+//         text: {
+//           body: message,
+//         },
+//       },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
+//           "Content-Type": "application/json",
+//         },
+//       }
+//     );
+
+//     res.status(200).json({
+//       success: true,
+//       data: response.data,
+//     });
+
+//   } catch (error) {
+//     console.log("WhatsApp API Error:");
+//     console.log(error.response?.data || error.message);
+
+//     res.status(500).json({
+//       success: false,
+//       error: error.response?.data || error.message,
+//     });
+//   }
+// });
+
 app.post("/api/send-whatsapp", async (req, res) => {
   try {
     const { to, message } = req.body;
@@ -213,13 +285,18 @@ app.post("/api/send-whatsapp", async (req, res) => {
       });
     }
 
-    console.log("Sending WhatsApp message to:", to);
+    // ✅ Clean phone number (remove +, spaces, dashes)
+    const cleanedNumber = to.replace(/\D/g, "");
+
+    console.log("📤 Sending WhatsApp message to:", cleanedNumber);
+    console.log("📱 PHONE_NUMBER_ID:", process.env.PHONE_NUMBER_ID ? "Loaded ✅" : "Missing ❌");
+    console.log("🔑 WHATSAPP_TOKEN:", process.env.WHATSAPP_TOKEN ? "Loaded ✅" : "Missing ❌");
 
     const response = await axios.post(
       `https://graph.facebook.com/v18.0/${process.env.PHONE_NUMBER_ID}/messages`,
       {
         messaging_product: "whatsapp",
-        to: to,
+        to: cleanedNumber,
         type: "text",
         text: {
           body: message,
@@ -233,14 +310,16 @@ app.post("/api/send-whatsapp", async (req, res) => {
       }
     );
 
+    console.log("✅ WhatsApp API Success:", response.data);
+
     res.status(200).json({
       success: true,
       data: response.data,
     });
 
   } catch (error) {
-    console.log("WhatsApp API Error:");
-    console.log(error.response?.data || error.message);
+    console.log("❌ WhatsApp API Error:");
+    console.log(JSON.stringify(error.response?.data, null, 2));
 
     res.status(500).json({
       success: false,
@@ -249,6 +328,105 @@ app.post("/api/send-whatsapp", async (req, res) => {
   }
 });
 
+
+// const OpenAI = require("openai");
+
+// const openai = new OpenAI({
+//   apiKey: process.env.OPENAI_API_KEY,
+// });
+
+/* ===================== AI INSIGHT ===================== */
+app.post("/api/ai-insight", async (req, res) => {
+  try {
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
+    }
+
+    // 🔹 Extract lead name (simple version)
+    const match = message.match(/about (.+)/i);
+    const leadName = match ? match[1] : null;
+
+    if (!leadName) {
+      return res.json({ reply: "Please specify a lead name." });
+    }
+
+    // 🔹 Fetch all tables (using your existing function)
+    const leads = await fetchTable("Leads");
+    const conversations = await fetchTable("Conversations");
+    const tasks = await fetchTable("Tasks");
+    const deals = await fetchTable("Deals");
+
+    // 🔹 Find Lead
+    const lead = leads.find(
+      (l) =>
+        l.fields?.Name?.toLowerCase() === leadName.toLowerCase()
+    );
+
+    if (!lead) {
+      return res.json({ reply: "Lead not found." });
+    }
+
+    const leadId = lead.id;
+
+    // 🔹 Filter related records
+    const relatedConversations = conversations.filter((c) =>
+      c.fields?.Lead?.includes(leadId)
+    );
+
+    const relatedTasks = tasks.filter((t) =>
+      t.fields?.Lead?.includes(leadId)
+    );
+
+    const relatedDeals = deals.filter((d) =>
+      d.fields?.Lead?.includes(leadId)
+    );
+
+    const crmData = {
+      lead: lead.fields,
+      conversations: relatedConversations.map(c => c.fields),
+      tasks: relatedTasks.map(t => t.fields),
+      deals: relatedDeals.map(d => d.fields),
+    };
+
+    // 🔹 Send to OpenAI
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: "You are an AI Sales Intelligence Assistant.",
+        },
+        {
+          role: "user",
+          content: `
+User Question:
+${message}
+
+CRM Data:
+${JSON.stringify(crmData, null, 2)}
+
+Provide:
+1. Full summary
+2. Risk analysis
+3. Conversion probability
+4. Suggested next action
+5. Revenue potential
+          `,
+        },
+      ],
+    });
+
+    res.json({
+      reply: completion.choices[0].message.content,
+    });
+
+  } catch (error) {
+    console.error("AI Insight Error:", error);
+    res.status(500).json({ error: "Failed to generate AI insight" });
+  }
+});
 /* ===================== START SERVER ===================== */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

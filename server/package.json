@@ -20,7 +20,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "mongodb": "^7.1.0",
-    "mongoose": "^9.1.6",
+    "mongoose": "^9.2.3",
     "package-name": "^0.1.0",
     "selenium-webdriver": "^4.40.0"
   }

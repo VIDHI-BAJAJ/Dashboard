@@ -2,14 +2,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
+  PieChart,
+  Pie,
   Tooltip,
   ResponsiveContainer,
-  Cell
+  Cell,
+  Legend
 } from "recharts";
 
 export default function Segmentation() {
@@ -30,16 +28,20 @@ export default function Segmentation() {
         "https://dashboard-pura.onrender.com/api/leads"
       );
 
-      const leads = response.data;
+      const leads = Array.isArray(response.data)
+        ? response.data
+        : response.data.data;
+
+      if (!leads) return;
 
       let hotArr = [];
       let warmArr = [];
       let coldArr = [];
 
-      let s1 = 0;
-      let s2 = 0;
-      let s3 = 0;
-      let s4 = 0;
+      let s1 = 0; // 100-80
+      let s2 = 0; // 80-60
+      let s3 = 0; // 60-30
+      let s4 = 0; // 30-0
 
       leads.forEach((lead) => {
         const score = Number(lead.fields?.["Lead Score (0–100)"]);
@@ -57,19 +59,15 @@ export default function Segmentation() {
         else coldArr.push(lead);
       });
 
-      hotArr.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
-      warmArr.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
-      coldArr.sort((a, b) => new Date(b.createdTime) - new Date(a.createdTime));
-
       setHotLeads(hotArr);
       setWarmLeads(warmArr);
       setColdLeads(coldArr);
 
       setChartData([
         { label: "100 - 80", value: s1, color: "#1e3a8a" },
-        { label: "80 - 60", value: s2, color: "#2563eb" },
-        { label: "60 - 30", value: s3, color: "#60a5fa" },
-        { label: "30 - 0", value: s4, color: "#60a5fa" }
+                { label: "80 - 60", value: s2, color: "#2563eb" },
+                { label: "60 - 30", value: s3, color: "#60a5fa" },
+                { label: "30 - 0", value: s4, color: "#60a5fa" }
       ]);
 
     } catch (error) {
@@ -80,82 +78,45 @@ export default function Segmentation() {
   return (
     <div className="w-full px-8 py-6">
 
-      {/* GRAPH */}
-      {/* GRAPH */}
-<div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-6">
-  <h2 className="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-6">
-    Lead Segmentation
-  </h2>
+      {/* PIE CHART */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 w-full md:w-1/2">
+        <h2 className="text-xl font-semibold text-gray-800 mb-6">
+          Lead Segmentation
+        </h2>
 
-  {/* Responsive Height */}
-  <div className="w-full h-[300px] sm:h-[400px]">
-    <ResponsiveContainer width="100%" height="100%">
-      <BarChart
-        data={chartData}
-        margin={{
-          top: 10,
-          right: 10,
-          left: 0,
-          bottom: 50
-        }}
-      >
-        <CartesianGrid vertical={false} stroke="#e5e7eb" />
+        <div className="w-full h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={chartData}
+                dataKey="value"
+                nameKey="label"
+                cx="40%"
+                cy="50%"
+                outerRadius={120}
+                label={({ percent }) =>
+                  `${(percent * 100).toFixed(0)}%`
+                }
+                labelLine={false}
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
 
-        {/* X Axis */}
-<XAxis
-  dataKey="label"
-  tick={({ x, y, payload }) => (
-    <text
-      x={x}
-      y={y + 10}
-      textAnchor="middle"
-      className="fill-gray-700 text-[10px] sm:text-[14px] md:text-[16px]"
-    >
-      {payload.value}
-    </text>
-  )}
-  label={{
-    value: "Lead Segmentation",
-    position: "insideBottom",
-    offset: -40,
-    style: { fontSize: 14 }
-  }}
-/>
+              <Legend
+                layout="vertical"
+                verticalAlign="middle"
+                align="right"
+              />
 
-        < YAxis
-  tick={({ x, y, payload }) => (
-    <text
-      x={x - 10}
-      y={y}
-      textAnchor="middle"
-      className="fill-gray-700  text-[10px] sm:text-[14px] md:text-[14px]"
-    >
-      {payload.value}
-    </text>
-  )}
-  label={{
-    value: "Leads",
-    angle: -90,
-    position: "insideLeft",
-    style: { fontSize: 14 }
-  }}
-/>
-        <Tooltip />
-        {/* Responsive Bar Size */}
-        <Bar
-          dataKey="value"
-          radius={[6, 6, 0, 0]}
-          barSize={35}
-        >
-          {chartData.map((entry, index) => (
-            <Cell key={index} fill={entry.color} />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
-  </div>
-</div>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
+      
 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
 
 {/* CARD COMPONENT */}
