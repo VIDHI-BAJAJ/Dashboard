@@ -29,12 +29,6 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-[#f5f5fb] flex items-center justify-center p-6">
       <style>{`
-        .gradient-panel {
-          background: radial-gradient(ellipse at 70% 20%, #c084fc 0%, transparent 50%),
-                      radial-gradient(ellipse at 20% 80%, #60a5fa 0%, transparent 50%),
-                      radial-gradient(ellipse at 80% 80%, #818cf8 0%, transparent 40%),
-                      linear-gradient(135deg, #3b82f6 0%, #6d28d9 50%, #7c3aed 100%);
-        }
         .input-field:focus {
           outline: none; border-color: #6366f1;
           box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
@@ -44,21 +38,21 @@ export default function Login() {
       <div className="bg-white rounded-3xl shadow-2xl flex w-full max-w-3xl overflow-hidden" style={{ minHeight: 520 }}>
 
         {/* Left Gradient Panel */}
-        <div className="gradient-panel w-5/12 hidden md:flex flex-col justify-between p-8">
-          <span style={{ fontSize: "2rem", color: "white", fontWeight: 300 }}>✳</span>
+        <div className="bg-gradient-to-r from-[#0f4c8a] to-[#1e6fd9] w-5/12 hidden md:flex flex-col justify-between p-8">
+          {/* <span style={{ fontSize: "2rem", color: "white", fontWeight: 300 }}>✳</span> */}
           <div>
             <p className="text-white/70 text-sm mb-2 font-medium">You can easily</p>
             <h2 className="text-white text-2xl font-bold leading-tight">
-              Get access your personal<br />hub for clarity and<br />productivity
+            Your Deals. Your Data. Your Dominance.
             </h2>
           </div>
         </div>
 
         {/* Right Form */}
         <div className="flex-1 flex flex-col justify-center px-10 py-10">
-          <span style={{ fontSize: "2rem", color: "#6366f1", lineHeight: 1 }}>✳</span>
+          {/* <span style={{ fontSize: "2rem", color: "#6366f1", lineHeight: 1 }}>✳</span> */}
           <h1 className="text-3xl font-bold text-gray-900 mt-2 mb-1">Welcome back</h1>
-          <p className="text-gray-400 text-sm mb-7">Sign in to access your tasks, notes, and projects.</p>
+          <p className="text-gray-400 text-sm mb-7">Sign in to access your Dashboard.</p>
 
           {error && (
             <div className="mb-4 text-sm text-red-500 bg-red-50 border border-red-100 rounded-xl px-4 py-2">{error}</div>
@@ -100,7 +94,7 @@ export default function Login() {
 
           <button
             onClick={handleSubmit} disabled={loading}
-            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold py-3 rounded-xl text-sm mb-5 transition"
+            className="w-full bg-[#004f98] hover:bg-[#004f98]  disabled:opacity-60 text-white font-semibold py-3 rounded-xl text-sm mb-5 transition"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
@@ -109,7 +103,7 @@ export default function Login() {
 
           <p className="text-center text-sm text-gray-500">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-indigo-600 font-semibold hover:underline">Sign up</Link>
+            <Link to="/signup" className="text-[#004f98] font-semibold hover:underline">Sign up</Link>
           </p>
         </div>
       </div>
