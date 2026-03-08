@@ -11,6 +11,7 @@ export const AuthProvider = ({ children }) => {
   const apiUrl = import.meta.env.VITE_API_URL || '';
   // Set axios default header
 
+  
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
