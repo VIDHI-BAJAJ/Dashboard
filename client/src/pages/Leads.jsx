@@ -8,8 +8,6 @@ export default function Leads() {
   useEffect(() => {
     const fetchLeads = async () => {
       try {
-        // Fetch leads data from the API
-        // Use VITE_API_URL for production, fallback to relative path for local development
         const apiUrl = import.meta.env.VITE_API_URL || '';
         const response = await fetch(`${apiUrl}/api/leads`);
         const data = await response.json();
