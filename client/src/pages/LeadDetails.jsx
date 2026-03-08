@@ -12,17 +12,26 @@ const LeadDetails = () => {
     const fetchLead = async () => {
       try {
         const apiUrl = import.meta.env.VITE_API_URL || "";
-        const response = await fetch(`${apiUrl}/api/leads`);
+        let foundLead = null;
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch leads");
+        // Try single-lead endpoint first
+        const response = await fetch(`${apiUrl}/api/leads/${leadId}`);
+        if (response.ok) {
+          foundLead = await response.json();
+        } else if (response.status === 404) {
+          // Fallback: fetch all leads and find by id (handles API/ID format differences)
+          const allResponse = await fetch(`${apiUrl}/api/leads`);
+          if (allResponse.ok) {
+            const leads = await allResponse.json();
+            foundLead = Array.isArray(leads)
+              ? leads.find((l) => l.id === leadId)
+              : null;
+          }
         }
-
-        const leads = await response.json();
-        const foundLead = leads.find((l) => l.id === leadId);
 
         if (foundLead) {
           setLead(foundLead);
+          setError(null);
         } else {
           setError("Lead not found");
         }
