@@ -15,7 +15,7 @@ import AddListing from "../components/AddListing.jsx";
 import logo from "../images/logo.png";
 import { useAuth } from "../context/AuthContext.jsx";
 
-// Helper: get initials from full name e.g. "Vidhi Bajaj" → "VB"
+
 function getInitials(name) {
   if (!name) return "U";
   const parts = name.trim().split(" ").filter(Boolean);
