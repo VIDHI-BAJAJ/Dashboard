@@ -3,7 +3,7 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { protect } = require('../middleware/auth.jsx');
+const { protect } = require('../middleware/auth.js');
 
 // Helper: generate JWT
 const generateToken = (id) => {

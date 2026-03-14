@@ -3,9 +3,11 @@ const axios = require("axios");
 const cors = require("cors");
 const mongoose = require("mongoose");
 require("dotenv").config();
-const listingRoutes = require("./routes/listingRoutes.jsx");
-const authRoutes = require("./routes/auth.jsx");   // ← ADD THIS
-
+const listingRoutes = require("./routes/listingRoutes.js");
+const authRoutes = require("./routes/auth.js");  
+const uploadRoutes  = require("./routes/uploadRoutes.js");  
+// const portalRoutes = require("./routes/portalRoutes.js"); 
+// const listingRoute = require("./routes/listingRoute.js"); 
 const app = express();
 app.use(express.json());
 app.use(
@@ -16,12 +18,16 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-
-// ── Routes ──────────────────────────────────────────────────────────
+ 
+// Keep JSON limit small — images go via /api/upload (multipart), NOT json body
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+ 
+// ── Routes ────────────────────────────────────────────────────
 app.use("/api/listings", listingRoutes);
-app.use("/api/auth", authRoutes);               // ← ADD THIS
+app.use("/api/auth",     authRoutes);
+app.use("/api/upload",   uploadRoutes);   // ← NEW: handles file uploads
+app.use("/api/files",    uploadRoutes);   // ← NEW: serves files from GridFS
 
 // ── Connect DB → Start Server ────────────────────────────────────────
 const connectDB = async () => {
@@ -174,6 +180,27 @@ app.post("/api/send-whatsapp", async (req, res) => {
     res.status(500).json({ success: false, error: error.response?.data || error.message });
   }
 });
+
+// app.post("/api/portal/activate", async (req, res) => {
+
+//   const { portal } = req.body;
+//   const agencyId = req.user?.agencyId || 1;
+
+//   await db.portalIntegrations.create({
+//     agencyId,
+//     portal,
+//     active: true,
+//     createdAt: new Date()
+//   });
+
+//   res.json({
+//     success: true
+//   });
+
+// });
+
+const portalRoutes = require('./routes/portalRoutes'); // ← ADD
+app.use('/api/portal', portalRoutes);  
 
 /* ===================== START SERVER ===================== */
 app.listen(PORT, () => {

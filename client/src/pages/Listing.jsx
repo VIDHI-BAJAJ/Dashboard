@@ -27,25 +27,75 @@ const TYPE_LABELS = {
   holidayRental: "Holiday Rental",
 };
 
+function normalize(l) {
+  const addr = l.property?.address || {};
+  const feat = l.property?.features || {};
+  return {
+    _id:           l._id,
+    listingType:   l.listingType,
+    listingStatus: l.status,
+    underOffer:    l.underOffer,
+    headline:      l.property?.headline || "",
+    priceView:     l.property?.priceView || "",
+    price:         l.property?.price || "",
+    streetNum:     addr.streetNumber || "",
+    street:        addr.street       || "",
+    suburb:        addr.suburb       || "",
+    state:         addr.state        || "",
+    bedrooms:      feat.bedrooms     || 0,
+    bathrooms:     feat.bathrooms    || 0,
+    garages:       feat.garages      || 0,
+    photos:        l.property?.images || [],
+  };
+}
+
 export default function Listings() {
-  const [openSync, setOpenSync] = useState(false);
-  const [listings, setListings] = useState([]);
-  const [search, setSearch] = useState("");
+  const [openSync, setOpenSync]         = useState(false);
+  const [listings, setListings]         = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [search, setSearch]             = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
+
+  // ── NEW: track portal connection status for the button ──
+  const [portalStatus, setPortalStatus] = useState("none");
+  // "none"      → blue "Setup Sync"
+  // "pending"   → grey "Processing..." (disabled)
+  // "connected" → blue "Publish Listings"
+
   const navigate = useNavigate();
+
+  // ── NEW: fetch portal status on page load ──
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    fetch("/api/portal/status", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setPortalStatus(data.status || "none"))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     fetch("/api/listings")
       .then((res) => res.json())
       .then((result) => {
-        if (result.success) setListings(result.data);
+        if (result.success && Array.isArray(result.listings)) {
+          setListings(result.listings.map(normalize));
+        } else {
+          console.error("Unexpected response shape:", result);
+          setListings([]);
+        }
       })
-      .catch((err) => console.error("Failed to fetch listings:", err));
+      .catch((err) => {
+        console.error("Failed to fetch listings:", err);
+        setListings([]);
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   const deleteListing = async (id) => {
     try {
-      const res = await fetch(`/api/listings/${id}`, { method: "DELETE" });
+      const res    = await fetch(`/api/listings/${id}`, { method: "DELETE" });
       const result = await res.json();
       if (result.success) {
         setListings((prev) => prev.filter((l) => l._id !== id));
@@ -55,34 +105,55 @@ export default function Listings() {
     }
   };
 
-  // Transform stored listings into the shape SyncModal expects
   const syncModalListings = listings.map((l) => ({
-    id:           l._id,
-    title:        l.title || l.headline || "Untitled Listing",
-    location:     [l.streetNum, l.street, l.suburb, l.state].filter(Boolean).join(" ") || "Address not provided",
-    price:        l.priceView
-                    || (l.priceFrom ? `$${Number(l.priceFrom).toLocaleString()}` : "")
-                    || (l.priceAud  ? `$${Number(l.priceAud).toLocaleString()}`  : "POA"),
-    bedrooms:     Number(l.bedrooms)  || 0,
-    bathrooms:    Number(l.bathrooms) || 0,
-    sqft:         Number(l.sqft)      || 0,
-    image:        l.photos?.[0] || "",
-    // Flag as pending if any key display fields are missing
-    pendingFields: !l.streetNum || !l.suburb || !l.state
-                   || (!l.priceView && !l.priceFrom && !l.priceAud),
+    id:       l._id,
+    title:    l.headline || "Untitled Listing",
+    location: [l.streetNum, l.street, l.suburb, l.state].filter(Boolean).join(" ") || "Address not provided",
+    price:    l.priceView || (l.price ? `$${Number(l.price).toLocaleString()}` : "POA"),
+    bedrooms:  Number(l.bedrooms)  || 0,
+    bathrooms: Number(l.bathrooms) || 0,
+    image:     l.photos?.[0] || "",
+    pendingFields: !l.streetNum || !l.suburb || !l.state || (!l.priceView && !l.price),
   }));
 
   const filtered = listings.filter((l) => {
     const q = search.toLowerCase();
     const matchSearch =
       !search ||
-      l.title?.toLowerCase().includes(q) ||
-      l.suburb?.toLowerCase().includes(q) ||
-      l.street?.toLowerCase().includes(q) ||
-      l.headline?.toLowerCase().includes(q);
+      l.headline?.toLowerCase().includes(q) ||
+      l.suburb?.toLowerCase().includes(q)   ||
+      l.street?.toLowerCase().includes(q);
     const matchStatus = filterStatus === "all" || l.listingStatus === filterStatus;
     return matchSearch && matchStatus;
   });
+
+  // ── Button label + style based on portal status ──
+  const buttonConfig = {
+    none: {
+      label: "Setup Sync",
+      className: "bg-[#004f98] hover:bg-[#003b75] text-white cursor-pointer",
+      disabled: false,
+    },
+    pending: {
+      label: "Processing...",
+      className: "bg-gray-300 text-gray-500 cursor-not-allowed",
+      disabled: true,
+    },
+    connected: {
+      label: "Publish Listings",
+      className: "bg-[#004f98] hover:bg-[#003b75] text-white cursor-pointer",
+      disabled: false,
+    },
+    timeout: {
+      label: "Setup Sync",
+      className: "bg-[#004f98] hover:bg-[#003b75] text-white cursor-pointer",
+      disabled: false,
+    },
+  }[portalStatus] || {
+    label: "Setup Sync",
+    className: "bg-[#004f98] hover:bg-[#003b75] text-white cursor-pointer",
+    disabled: false,
+  };
 
   return (
     <div className="relative">
@@ -93,11 +164,14 @@ export default function Listings() {
           <h2 className="text-lg font-semibold text-gray-800">One Platform, Multiple Portals</h2>
           <p className="text-sm text-gray-500 mt-1">Sync your listings with external portals in a few simple steps</p>
         </div>
+
+        {/* ── DYNAMIC BUTTON ── */}
         <button
-          onClick={() => setOpenSync(true)}
-          className="bg-[#004f98] text-white font-medium px-5 py-2 rounded-xl hover:bg-[#003b75] transition"
+          onClick={() => !buttonConfig.disabled && setOpenSync(true)}
+          disabled={buttonConfig.disabled}
+          className={`font-medium px-5 py-2 rounded-xl transition ${buttonConfig.className}`}
         >
-          Setup Sync
+          {buttonConfig.label}
         </button>
       </div>
 
@@ -105,7 +179,7 @@ export default function Listings() {
       <div className="flex justify-between items-center mb-5">
         <div>
           <h1 className="text-2xl font-semibold text-gray-800">All Listings</h1>
-          {listings.length > 0 && (
+          {!loading && listings.length > 0 && (
             <p className="text-sm text-gray-400 mt-0.5">
               {listings.length} listing{listings.length !== 1 ? "s" : ""}
             </p>
@@ -122,8 +196,15 @@ export default function Listings() {
         </button>
       </div>
 
+      {/* Loading */}
+      {loading && (
+        <div className="flex items-center justify-center py-20">
+          <div className="w-6 h-6 border-2 border-[#004f98] border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
       {/* Filters */}
-      {listings.length > 0 && (
+      {!loading && listings.length > 0 && (
         <div className="flex gap-3 mb-5">
           <div className="relative flex-1 max-w-sm">
             <svg className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -132,7 +213,7 @@ export default function Listings() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by title, suburb or street..."
+              placeholder="Search by headline, suburb or street..."
               className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 bg-white"
             />
           </div>
@@ -152,7 +233,7 @@ export default function Listings() {
       )}
 
       {/* Empty State */}
-      {listings.length === 0 && (
+      {!loading && listings.length === 0 && (
         <div className="bg-white p-16 rounded-xl shadow-sm text-center">
           <div className="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <svg className="w-7 h-7 text-blue-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -171,14 +252,14 @@ export default function Listings() {
       )}
 
       {/* No search results */}
-      {listings.length > 0 && filtered.length === 0 && (
+      {!loading && listings.length > 0 && filtered.length === 0 && (
         <div className="bg-white p-10 rounded-xl shadow-sm text-center text-gray-400 text-sm">
           No listings match your search.
         </div>
       )}
 
       {/* Listings Grid */}
-      {filtered.length > 0 && (
+      {!loading && filtered.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {filtered.map((listing) => (
             <ListingCard
@@ -190,23 +271,22 @@ export default function Listings() {
         </div>
       )}
 
-      {/* SyncModal — receives listings read from localStorage */}
+      {/* SyncModal */}
       {openSync && (
-        <SyncModal
-          onClose={() => setOpenSync(false)}
-          listings={syncModalListings}
-          onEditListing={(id) => navigate(`/listings/edit/${id}`)}
-          onConfirmSelection={(selectedIds, portal) => {
-            console.log("Syncing to", portal, selectedIds);
-            // TODO: wire up your sync API here
-          }}
-        />
-      )}
+  <SyncModal
+    onClose={() => setOpenSync(false)}
+    listings={syncModalListings}
+    onEditListing={(id) => navigate(`/listings/edit/${id}`)}
+    initialPortalStatus={portalStatus}
+    onStatusChange={(newStatus) => setPortalStatus(newStatus)}
+    startAtStep={portalStatus === "connected" ? 2 : 0}  // ← ADD THIS
+  />
+)}
     </div>
   );
 }
 
-// ─── Listing Card ─────────────────────────────────────────────────────────────
+// ─── Listing Card ─────────────────────────────────────────────
 function ListingCard({ listing, onDelete }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -215,8 +295,7 @@ function ListingCard({ listing, onDelete }) {
 
   const price =
     listing.priceView ||
-    (listing.priceFrom ? `$${Number(listing.priceFrom).toLocaleString()}` : "") ||
-    (listing.priceAud  ? `$${Number(listing.priceAud).toLocaleString()}`  : "POA");
+    (listing.price ? `$${Number(listing.price).toLocaleString()}` : "POA");
 
   const coverPhoto  = listing.photos?.[0];
   const statusLabel = STATUS_LABELS[listing.listingStatus] || "Active";
@@ -225,15 +304,9 @@ function ListingCard({ listing, onDelete }) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group">
-
-      {/* Photo */}
       <div className="aspect-video bg-gray-100 relative overflow-hidden">
         {coverPhoto ? (
-          <img
-            src={coverPhoto}
-            alt={listing.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-          />
+          <img src={coverPhoto} alt={listing.headline} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
             <svg className="w-10 h-10 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
@@ -243,13 +316,9 @@ function ListingCard({ listing, onDelete }) {
           </div>
         )}
         <div className="absolute top-3 left-3 flex gap-1.5">
-          <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${statusColor}`}>
-            {statusLabel}
-          </span>
+          <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium ${statusColor}`}>{statusLabel}</span>
           {listing.underOffer === "yes" && (
-            <span className="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700 font-medium">
-              Under Offer
-            </span>
+            <span className="text-xs px-2.5 py-0.5 rounded-full bg-orange-100 text-orange-700 font-medium">Under Offer</span>
           )}
         </div>
         {listing.photos?.length > 1 && (
@@ -258,12 +327,8 @@ function ListingCard({ listing, onDelete }) {
           </span>
         )}
       </div>
-
-      {/* Body */}
       <div className="p-4">
-        <h3 className="text-sm font-semibold text-gray-800 line-clamp-1 mb-1">
-          {listing.title || listing.headline || "Untitled Listing"}
-        </h3>
+        <h3 className="text-sm font-semibold text-gray-800 line-clamp-1 mb-1">{listing.headline || "Untitled Listing"}</h3>
         <p className="text-xs text-gray-400 flex items-center gap-1 mb-3">
           <svg className="w-3 h-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
@@ -271,25 +336,16 @@ function ListingCard({ listing, onDelete }) {
           </svg>
           <span className="truncate">{address}</span>
         </p>
-
         <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
           {listing.bedrooms  ? <span className="flex items-center gap-1"><BedIcon />  {listing.bedrooms} bd</span>  : null}
           {listing.bathrooms ? <span className="flex items-center gap-1"><BathIcon /> {listing.bathrooms} ba</span> : null}
           {listing.garages   ? <span className="flex items-center gap-1"><CarIcon />  {listing.garages} gr</span>   : null}
-          {listing.sqft      ? <span className="ml-auto">{Number(listing.sqft).toLocaleString()} sqft</span>        : null}
         </div>
-
         <p className="text-base font-bold text-[#004f98] mb-3">{price}</p>
-
         <div className="flex items-center justify-between pt-3 border-t border-gray-50">
           <span className="text-[10px] text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">{typeLabel}</span>
           {!confirmDelete ? (
-            <button
-              onClick={() => setConfirmDelete(true)}
-              className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 transition"
-            >
-              Delete
-            </button>
+            <button onClick={() => setConfirmDelete(true)} className="text-xs text-red-400 hover:text-red-600 px-2 py-1 rounded hover:bg-red-50 transition">Delete</button>
           ) : (
             <div className="flex items-center gap-1">
               <span className="text-xs text-gray-500">Sure?</span>
