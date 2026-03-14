@@ -245,4 +245,5 @@ const ListingSchema = new mongoose.Schema(
   { timestamps: true }  // ← { timestamps } is the SECOND argument to Schema()
 );
 
+
 module.exports = mongoose.models.Listing || mongoose.model("Listing", ListingSchema);

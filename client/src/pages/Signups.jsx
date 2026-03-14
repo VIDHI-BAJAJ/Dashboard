@@ -49,6 +49,7 @@ export default function Signup() {
           </div>
         </div>
 
+
         {/* Right Form */}
         <div className="flex-1 flex flex-col justify-center px-10 py-10">
           {/* <span style={{ fontSize: "2rem", color: "#6366f1", lineHeight: 1 }}>✳</span> */}
