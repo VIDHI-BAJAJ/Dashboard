@@ -58,7 +58,7 @@ export default function SyncModal({ onClose, listings, onEditListing, initialPor
         setActivationLoading(false);
       }
     } else {
-      const res = await fetch("/api/portal/activate", {
+      const res = await fetch('${API_URL}/apiportal/activate', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ portal: activePortal }),
@@ -72,7 +72,7 @@ export default function SyncModal({ onClose, listings, onEditListing, initialPor
     setActivationLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await fetch("/api/portal/retry", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+      await fetch('${API_URL}/api/portal/retry', { method: "POST", headers: { Authorization: `Bearer ${token}` } });
       setPollActive(true);
       onStatusChange?.("pending");
     } catch (err) {
@@ -87,7 +87,7 @@ export default function SyncModal({ onClose, listings, onEditListing, initialPor
     setPublishingListings(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch("/api/listings/publish", {
+      const res = await fetch('${API_URL}/api/listings/publish', {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ listingIds: selectedListings, portal: "realestate" }),

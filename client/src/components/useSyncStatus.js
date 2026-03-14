@@ -4,13 +4,15 @@ export function useSyncStatus(active) {
   const [data, setData] = useState({ status: "none", ticketNumber: null, connectedAt: null });
   const intervalRef = useRef(null);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+  
   useEffect(() => {
     if (!active) return;
     const TERMINAL = ["connected", "timeout"];
     const poll = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("/api/portal/status", {
+        const res = await fetch('${API_URL}/api/portal/status', {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) return;
