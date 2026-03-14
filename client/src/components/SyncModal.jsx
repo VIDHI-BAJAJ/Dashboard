@@ -16,6 +16,7 @@ export default function SyncModal({ onClose, listings, onEditListing, initialPor
   const { status: liveStatus, ticketNumber } = useSyncStatus(pollActive);
   const portalStatus = pollActive ? liveStatus : initialPortalStatus;
 
+  const API_URL = import.meta.env.VITE_API_URL;
   // ── Notify Listing.jsx when status changes — updates banner button live ──
   useEffect(() => {
     if (liveStatus === "pending")   onStatusChange?.("pending");
@@ -39,7 +40,7 @@ export default function SyncModal({ onClose, listings, onEditListing, initialPor
       setActivationLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("/api/portal/setup-sync", {
+        const res = await fetch('${API_URL}/api/portal/setup-sync', {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         });
