@@ -1,3 +1,6 @@
+// 
+
+
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -23,6 +26,13 @@ const userSchema = new mongoose.Schema(
       required: [true, 'Password is required'],
       minlength: [6, 'Password must be at least 6 characters'],
       select: false
+    },
+    phone: {
+      type: String,
+      required: [true, 'Phone number is required'],
+      unique: true,
+      trim: true,
+      match: [/^\+\d{7,15}$/, 'Please enter a valid phone number with country code']
     },
     avatar: {
       type: String,

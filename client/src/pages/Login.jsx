@@ -41,9 +41,9 @@ export default function Login() {
         <div className="bg-gradient-to-r from-[#0f4c8a] to-[#1e6fd9] w-5/12 hidden md:flex flex-col justify-between p-8">
           {/* <span style={{ fontSize: "2rem", color: "white", fontWeight: 300 }}>✳</span> */}
           <div>
-            <p className="text-white/70 text-sm mb-2 font-medium">You can easily</p>
+            <p className="text-white/70 text-sm mb-2 font-medium"> Never lose another enquiry.</p>
             <h2 className="text-white text-2xl font-bold leading-tight">
-            Your Deals. Your Data. Your Dominance.
+           Harbour AI responds instantly, follows up consistently, and keeps your CRM clean.
             </h2>
           </div>
         </div>
