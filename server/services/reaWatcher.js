@@ -96,6 +96,7 @@ async function checkREAEmail(userId) {
       seen:    false,
     });
 
+    
     console.log(`📬 Emails found for user ${userId}:`, mails.length);
 
     if (mails.length > 0) {
