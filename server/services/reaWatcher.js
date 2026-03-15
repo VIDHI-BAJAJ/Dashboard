@@ -11,11 +11,10 @@ async function checkREAEmail() {
     await client.connect();
     await client.mailboxOpen("INBOX");
     const mails = await client.search({
-        from: "vidhibajaj2603@gmail.com",  // ← your test email
-        subject: "Change my uploader",      // ← keep same
-        seen: false,
-      });
-
+      from: "vidhibajaj2603@gmail.com",  // ← who SENDS the test email
+      subject: "Change my uploader",
+      seen: false,
+    });
       console.log("📬 Emails found:", mails.length); // ← ADD THIS LINE
 
     if (mails.length > 0) {
