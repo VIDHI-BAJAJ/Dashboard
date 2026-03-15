@@ -95,7 +95,7 @@ const axios  = require("axios");
 const crypto = require("crypto");
 const Portal = require("../models/Portal");
 
-const REA_TOKEN_URL  = "https://api.realestate.com.au/credentials/token";
+const REA_TOKEN_URL  = "https://api.realestate.com.au/oauth/token";
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
 // ── Decrypt helper (mirrors encrypt in portalController) ──────
