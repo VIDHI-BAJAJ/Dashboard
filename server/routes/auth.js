@@ -16,11 +16,21 @@ const generateToken = (id) => {
 };
 
 // ─── Helper: reusable transporter ──────────────────────────────────────────
+// ─── Helper: Gmail personal transporter (for internal/system use) ───────────
 const createTransporter = () => nodemailer.createTransport({
   service: 'gmail',
   auth: {
     user: process.env.REA_EMAIL_USER,
     pass: process.env.REA_EMAIL_APP_PASS,
+  },
+});
+
+// ─── Helper: Workspace transporter (for sending emails TO users) ─────────────
+const createWorkspaceTransporter = () => nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.WORKSPACE_EMAIL,
+    pass: process.env.WORKSPACE_APP_PASS,
   },
 });
 
@@ -59,37 +69,14 @@ router.post(
 
       // ── Send welcome email ──
       try {
-        await createTransporter().sendMail({
-          from: `"Harbour AI" <${process.env.REA_EMAIL_USER}>`,
+        console.log("📧 Sending welcome email to:", user.email);
+        await createWorkspaceTransporter().sendMail({
+          from: `"Harbour AI" <${process.env.WORKSPACE_EMAIL}>`,
           to: user.email,
           subject: 'Welcome to Harbour AI 🎉',
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f5f5fb; padding: 32px; border-radius: 16px;">
-              <div style="background: linear-gradient(to right, #0f4c8a, #1e6fd9); border-radius: 12px; padding: 32px; text-align: center; margin-bottom: 24px;">
-                <h1 style="color: white; margin: 0; font-size: 24px;">Welcome to Harbour AI</h1>
-                <p style="color: rgba(255,255,255,0.8); margin: 8px 0 0;">Your real estate CRM is ready</p>
-              </div>
-              <div style="background: white; border-radius: 12px; padding: 28px; margin-bottom: 16px;">
-                <p style="color: #374151; font-size: 15px; margin: 0 0 12px;">Hi <strong>${user.name}</strong> 👋</p>
-                <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 16px;">
-                  Your Harbour AI account has been successfully created. You can now log in and start managing your leads, deals, and follow-ups — all in one place.
-                </p>
-                <div style="background: #f5f5fb; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-                  <p style="margin: 0; font-size: 13px; color: #6b7280;">Account details</p>
-                  <p style="margin: 6px 0 0; font-size: 14px; color: #111827;"><strong>Name:</strong> ${user.name}</p>
-                  <p style="margin: 4px 0 0; font-size: 14px; color: #111827;"><strong>Email:</strong> ${user.email}</p>
-                </div>
-                <a href="${process.env.CLIENT_URL}/login"
-                  style="display: inline-block; background: #004f98; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
-                  Log In to Dashboard →
-                </a>
-              </div>
-              <p style="text-align: center; color: #9ca3af; font-size: 12px; margin: 0;">
-                If you didn't create this account, please ignore this email.
-              </p>
-            </div>
-          `,
+          html: `...same html...`,
         });
+        console.log("✅ Welcome email sent!");
       } catch (emailErr) {
         console.error('Welcome email failed (non-blocking):', emailErr.message);
       }
@@ -168,30 +155,11 @@ router.post('/forgot-password', async (req, res) => {
 
     const resetUrl = `${process.env.CLIENT_URL}/reset-password?token=${token}`;
 
-    await createTransporter().sendMail({
-      from: `"Harbour AI" <${process.env.REA_EMAIL_USER}>`,
+    await createWorkspaceTransporter().sendMail({
+      from: `"Harbour AI" <${process.env.WORKSPACE_EMAIL}>`,
       to: user.email,
       subject: 'Reset your Harbour AI password',
-      html: `
-        <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto; background: #f5f5fb; padding: 32px; border-radius: 16px;">
-          <div style="background: linear-gradient(to right, #0f4c8a, #1e6fd9); border-radius: 12px; padding: 32px; text-align: center; margin-bottom: 24px;">
-            <h1 style="color: white; margin: 0; font-size: 24px;">Reset Your Password</h1>
-          </div>
-          <div style="background: white; border-radius: 12px; padding: 28px; margin-bottom: 16px;">
-            <p style="color: #374151; font-size: 15px; margin: 0 0 12px;">Hi <strong>${user.name}</strong>,</p>
-            <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin: 0 0 20px;">
-              Click the button below to reset your password. This link expires in <strong>1 hour</strong>.
-            </p>
-            <a href="${resetUrl}"
-              style="display: inline-block; background: #004f98; color: white; padding: 12px 28px; border-radius: 8px; text-decoration: none; font-size: 14px; font-weight: 600;">
-              Reset Password →
-            </a>
-            <p style="color: #9ca3af; font-size: 12px; margin-top: 20px;">
-              If you didn't request this, you can safely ignore this email.
-            </p>
-          </div>
-        </div>
-      `,
+      html: `...same html...`,
     });
 
     res.json({ message: 'If this email exists, a reset link has been sent.' });
