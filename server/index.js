@@ -390,6 +390,10 @@ app.post("/api/send-whatsapp", async (req, res) => {
   }
 });
 
+
+app.use('/api/portal', portalRoutes);
+
+
 /* ===================== START SERVER ===================== */
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

@@ -388,13 +388,19 @@ const retrySync = async (req, res) => {
   }
 };
 
+
+
 // ─────────────────────────────────────────────────────────────
 // POST /api/portal/publish
 // Converts listings to REAXML → uploads to REA API
 // Body: { listingIds: ["id1", "id2"] }
 // ─────────────────────────────────────────────────────────────
 const publishListings = async (req, res) => {
-  try {
+    try {
+    console.log("🚀 publishListings called");
+    console.log("👤 userId:", req.user?._id);
+    console.log("📋 listingIds:", req.body?.listingIds);
+
     const userId     = req.user._id;
     const { listingIds } = req.body;
 
