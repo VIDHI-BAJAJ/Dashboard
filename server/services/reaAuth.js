@@ -67,8 +67,8 @@ async function getValidToken(userId) {
 
   // Decrypt clientSecret before sending to REA
   const decryptedSecret = decrypt(portal.clientSecret);
-  console.log("🔑 Decrypted secret (first 8):", decryptedSecret?.substring(0, 8));
-  console.log("🔑 Decrypted secret length:", decryptedSecret?.length);
+  console.log("🔑 Decrypted secret FULL:", decryptedSecret);
+;
 
   console.log("🔄 Fetching fresh REA OAuth token...");
   const tokenData = await fetchNewToken(portal.clientId, decryptedSecret);
@@ -94,7 +94,7 @@ async function fetchNewToken(clientId, clientSecret) {
   try {
     console.log("📤 Calling REA OAuth:", REA_TOKEN_URL);
     console.log("   client_id:", clientId);
-    console.log("   client_secret (first 8):", clientSecret?.substring(0, 8));
+    console.log("   client_secret FULL:", clientSecret);
     console.log("   client_secret length:", clientSecret?.length);
 
     const response = await axios.post(
