@@ -16,18 +16,24 @@ const generateToken = (id) => {
 };
 
 // ─── Helper: reusable transporter ──────────────────────────────────────────
-// ─── Helper: Gmail personal transporter (for internal/system use) ───────────
+// ─── Helper: Gmail personal transporter ─────────────────────────────────────
 const createTransporter = () => nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // TLS
+  family: 4,     // 👈 force IPv4
   auth: {
     user: process.env.REA_EMAIL_USER,
     pass: process.env.REA_EMAIL_APP_PASS,
   },
 });
 
-// ─── Helper: Workspace transporter (for sending emails TO users) ─────────────
+// ─── Helper: Workspace transporter ──────────────────────────────────────────
 const createWorkspaceTransporter = () => nodemailer.createTransport({
-  service: 'gmail',
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // TLS
+  family: 4,     // 👈 force IPv4
   auth: {
     user: process.env.WORKSPACE_EMAIL,
     pass: process.env.WORKSPACE_APP_PASS,
