@@ -58,28 +58,30 @@ router.post("/", upload.any(), async (req, res) => {
 });
 
 // ── GET /api/files/:id — serve file from GridFS ───────────────
-router.get("/files/:id", async (req, res) => {
-  try {
-    const db     = mongoose.connection.db;
-    const bucket = new GridFSBucket(db, { bucketName: "listings_files" });
-    const fileId = new ObjectId(req.params.id);
+// router.get("/files/:id", async (req, res) => {
+//   try {
+//     const db     = mongoose.connection.db;
+//     const bucket = new GridFSBucket(db, { bucketName: "listings_files" });
+//     const fileId = new ObjectId(req.params.id);
 
-    const files = await bucket.find({ _id: fileId }).toArray();
-    if (!files.length) {
-      return res.status(404).json({ success: false, message: "File not found" });
-    }
+//     const files = await bucket.find({ _id: fileId }).toArray();
+//     if (!files.length) {
+//       return res.status(404).json({ success: false, message: "File not found" });
+//     }
 
-    res.set("Content-Type", files[0].contentType || "application/octet-stream");
-    res.set("Cache-Control", "public, max-age=31536000");
+//     res.set("Content-Type", files[0].contentType || "application/octet-stream");
+//     res.set("Cache-Control", "public, max-age=31536000");
 
-    bucket.openDownloadStream(fileId)
-      .on("error", () => res.status(404).end())
-      .pipe(res);
+//     bucket.openDownloadStream(fileId)
+//       .on("error", () => res.status(404).end())
+//       .pipe(res);
 
-  } catch (err) {
-    console.error("File serve error:", err);
-    return res.status(500).json({ success: false, message: err.message });
-  }
-});
+//   } catch (err) {
+//     console.error("File serve error:", err);
+//     return res.status(500).json({ success: false, message: err.message });
+//   }
+// });
+
+router.get("/:id", getFile);
 
 module.exports = router;
