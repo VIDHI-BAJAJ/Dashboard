@@ -9,9 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   const apiUrl = import.meta.env.VITE_API_URL || '';
-  // Set axios default header
 
-  
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -20,12 +18,11 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // Load user on mount if token exists
   useEffect(() => {
     const loadUser = async () => {
       if (token) {
         try {
-          const res = await axios.get(`${apiUrl}/api/auth/me`)
+          const res = await axios.get(`${apiUrl}/api/auth/me`);
           setUser(res.data.user);
         } catch {
           localStorage.removeItem('token');
@@ -47,9 +44,8 @@ export const AuthProvider = ({ children }) => {
   };
 
   // register only creates the account — does NOT log the user in
-  // so after register() the app navigates to /login normally
-  const register = async (name, email, password) => {
-    const res = await axios.post(`${apiUrl}/api/auth/register`, { name, email, password });
+  const register = async (name, email, password, phone) => {
+    const res = await axios.post(`${apiUrl}/api/auth/register`, { name, email, password, phone });
     return res.data;
   };
 

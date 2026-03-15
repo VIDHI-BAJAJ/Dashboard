@@ -1,6 +1,3 @@
-// 
-
-
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
@@ -37,7 +34,9 @@ const userSchema = new mongoose.Schema(
     avatar: {
       type: String,
       default: ''
-    }
+    },
+    resetPasswordToken: { type: String },
+    resetPasswordExpiry: { type: Date },
   },
   { timestamps: true }
 );

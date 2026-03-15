@@ -26,6 +26,7 @@
     "mongodb": "^7.1.0",
     "mongoose": "^9.2.3",
     "multer": "^2.1.1",
+    "nodemailer": "^8.0.2",
     "package-name": "^0.1.0",
     "selenium-webdriver": "^4.40.0"
   }
