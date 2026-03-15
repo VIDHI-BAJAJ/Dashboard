@@ -1,11 +1,9 @@
 // services/reaXmlGenerator.js
 // Converts MongoDB listing (JSON) → REAXML format
 // Supports: residential, rental, commercial, land, rural
-// Based on official REAXML spec from REA partner docs
 
 function formatDate(date) {
-    // REA date format: 2009-01-01-12:30:00
-    const d = date ? new Date(date) : new Date();
+    const d   = date ? new Date(date) : new Date();
     const pad = (n) => String(n).padStart(2, "0");
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}-${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
   }
@@ -20,43 +18,6 @@ function formatDate(date) {
       .replace(/'/g,  "&apos;");
   }
   
-  // ─────────────────────────────────────────────────────────────
-  // MAIN EXPORT — converts listing + agentId → XML string
-  // ─────────────────────────────────────────────────────────────
-  function generateREAXML(listing, agentId) {
-    const now         = formatDate(new Date());
-    const listingType = listing.listingType || "residential";
-    const status      = mapStatus(listing.status || "active");
-  
-    let innerXml = "";
-  
-    switch (listingType) {
-      case "residential":
-        innerXml = buildResidential(listing, agentId, status, now);
-        break;
-      case "rental":
-        innerXml = buildRental(listing, agentId, status, now);
-        break;
-      case "commercial":
-        innerXml = buildCommercial(listing, agentId, status, now);
-        break;
-      case "land":
-        innerXml = buildLand(listing, agentId, status, now);
-        break;
-      case "rural":
-        innerXml = buildRural(listing, agentId, status, now);
-        break;
-      default:
-        innerXml = buildResidential(listing, agentId, status, now);
-    }
-  
-    return `<?xml version="1.0" encoding="UTF-8"?>
-  <!DOCTYPE propertyList SYSTEM "http://reaxml.realestate.com.au/propertyList.dtd">
-  <propertyList date="${now}">
-  ${innerXml}
-  </propertyList>`;
-  }
-  
   // ── Map your DB status → REA status ───────────────────────────
   function mapStatus(status) {
     const map = {
@@ -66,7 +27,7 @@ function formatDate(date) {
       withdrawn: "withdrawn",
       offmarket: "withdrawn",
     };
-    return map[status] || "current";
+    return map[(status || "active").toLowerCase()] || "current";
   }
   
   // ── Shared address block ───────────────────────────────────────
@@ -90,54 +51,58 @@ function formatDate(date) {
     const tf = Array.isArray(toggleFeatures) ? toggleFeatures : [];
     return `
       <features>
-        ${feat.bedrooms    ? `<bedrooms>${feat.bedrooms}</bedrooms>` : ""}
-        ${feat.bathrooms   ? `<bathrooms>${feat.bathrooms}</bathrooms>` : ""}
-        ${feat.ensuite     ? `<ensuite>${feat.ensuite}</ensuite>` : ""}
-        ${feat.garages     ? `<garages>${feat.garages}</garages>` : ""}
-        ${feat.carports    ? `<carports>${feat.carports}</carports>` : ""}
-        ${tf.includes("remoteGarage")    ? "<remoteGarage>yes</remoteGarage>"   : ""}
-        ${tf.includes("secureParking")   ? "<secureParking>yes</secureParking>" : ""}
-        ${tf.includes("airConditioning") ? "<airConditioning>1</airConditioning>" : ""}
-        ${tf.includes("alarmSystem")     ? "<alarmSystem>1</alarmSystem>"       : ""}
-        ${tf.includes("pool")            ? '<pool type="inground">yes</pool>'   : ""}
-        ${tf.includes("spa")             ? '<spa type="inground">yes</spa>'     : ""}
-        ${tf.includes("tennisCourt")     ? "<tennisCourt>yes</tennisCourt>"     : ""}
-        ${tf.includes("balcony")         ? "<balcony>yes</balcony>"             : ""}
-        ${tf.includes("deck")            ? "<deck>yes</deck>"                   : ""}
-        ${tf.includes("courtyard")       ? "<courtyard>yes</courtyard>"         : ""}
-        ${tf.includes("shed")            ? "<shed>yes</shed>"                   : ""}
-        ${tf.includes("fullyFenced")     ? "<fullyFenced>yes</fullyFenced>"     : ""}
-        ${tf.includes("openFirePlace")   ? "<openFirePlace>1</openFirePlace>"   : ""}
+        ${feat.bedrooms  ? `<bedrooms>${feat.bedrooms}</bedrooms>`   : ""}
+        ${feat.bathrooms ? `<bathrooms>${feat.bathrooms}</bathrooms>` : ""}
+        ${feat.ensuite   ? `<ensuite>${feat.ensuite}</ensuite>`       : ""}
+        ${feat.garages   ? `<garages>${feat.garages}</garages>`       : ""}
+        ${feat.carports  ? `<carports>${feat.carports}</carports>`    : ""}
+        ${tf.includes("remoteGarage")      ? "<remoteGarage>yes</remoteGarage>"     : ""}
+        ${tf.includes("secureParking")     ? "<secureParking>yes</secureParking>"   : ""}
+        ${tf.includes("airConditioning")   ? "<airConditioning>1</airConditioning>" : ""}
+        ${tf.includes("alarmSystem")       ? "<alarmSystem>1</alarmSystem>"         : ""}
+        ${tf.includes("pool")    || tf.includes("poolInGround")   ? '<pool type="inground">yes</pool>'   : ""}
+        ${tf.includes("spa")     || tf.includes("spaInground")    ? '<spa type="inground">yes</spa>'     : ""}
+        ${tf.includes("tennisCourt")       ? "<tennisCourt>yes</tennisCourt>"       : ""}
+        ${tf.includes("balcony")           ? "<balcony>yes</balcony>"               : ""}
+        ${tf.includes("deck")              ? "<deck>yes</deck>"                     : ""}
+        ${tf.includes("courtyard")         ? "<courtyard>yes</courtyard>"           : ""}
+        ${tf.includes("shed")              ? "<shed>yes</shed>"                     : ""}
+        ${tf.includes("fullyFenced")       ? "<fullyFenced>yes</fullyFenced>"       : ""}
+        ${tf.includes("openFirePlace")     ? "<openFirePlace>1</openFirePlace>"     : ""}
         ${otherFeatures ? `<otherFeatures>${escapeXml(otherFeatures)}</otherFeatures>` : ""}
       </features>`;
   }
   
-  // ── Shared images block ────────────────────────────────────────
+  // ── Images block — FIXED format extraction ─────────────────────
   function buildImages(images = [], now) {
-    if (!images.length) return "";
+    if (!images || !images.length) return "";
     return `
       <images>
         ${images.map((url, i) => {
           const id = i === 0 ? "m" : String.fromCharCode(97 + i); // m, a, b, c...
-          const fmt = url.split(".").pop()?.toLowerCase() || "jpg";
-          return `<img id="${id}" modTime="${now}" url="${escapeXml(url)}" format="${fmt}"/>`;
+          // ✅ FIX: extract extension from filename only (not full URL)
+          const filename = url.split("/").pop()?.split("?")[0] || "";
+          const ext      = filename.includes(".") ? filename.split(".").pop().toLowerCase() : "jpg";
+          const format   = ["jpg","jpeg","png","gif","webp"].includes(ext) ? (ext === "jpeg" ? "jpg" : ext) : "jpg";
+          return `<img id="${id}" modTime="${now}" url="${escapeXml(url)}" format="${format}"/>`;
         }).join("\n      ")}
       </images>`;
   }
   
-  // ── Shared floorplans block ────────────────────────────────────
+  // ── Floorplans block ───────────────────────────────────────────
   function buildFloorplans(floorplans = [], now) {
-    if (!floorplans.length) return "";
+    if (!floorplans || !floorplans.length) return "";
     return `
       <objects>
         ${floorplans.map((url, i) => {
-          const fmt = url.split(".").pop()?.toLowerCase() || "gif";
-          return `<floorplan id="${i+1}" modTime="${now}" url="${escapeXml(url)}" format="${fmt}"/>`;
+          const filename = url.split("/").pop()?.split("?")[0] || "";
+          const ext      = filename.includes(".") ? filename.split(".").pop().toLowerCase() : "gif";
+          return `<floorplan id="${i+1}" modTime="${now}" url="${escapeXml(url)}" format="${ext}"/>`;
         }).join("\n      ")}
       </objects>`;
   }
   
-  // ── Listing agent block ────────────────────────────────────────
+  // ── Listing agent block — FIXED <name> tag ─────────────────────
   function buildListingAgent(agent) {
     if (!agent?.name) return "";
     return `
@@ -161,9 +126,44 @@ function formatDate(date) {
     if (!buildingDetails?.area) return "";
     return `
       <buildingDetails>
-        <area unit="${buildingDetails.unit || "square"}">${buildingDetails.area}</area>
+        <area unit="square">${buildingDetails.area}</area>
         ${buildingDetails.energyRating ? `<energyRating>${buildingDetails.energyRating}</energyRating>` : ""}
       </buildingDetails>`;
+  }
+  
+  // ── Vendor details block ───────────────────────────────────────
+  function buildVendorDetails(vendor) {
+    if (!vendor?.name) return "";
+    return `
+      <vendorDetails>
+        <name>${escapeXml(vendor.name)}</name>
+        ${vendor.phone ? `<telephone type="mobile">${escapeXml(vendor.phone)}</telephone>` : ""}
+      </vendorDetails>`;
+  }
+  
+  // ─────────────────────────────────────────────────────────────
+  // MAIN EXPORT
+  // ─────────────────────────────────────────────────────────────
+  function generateREAXML(listing, agentId) {
+    const now         = formatDate(new Date());
+    const listingType = (listing.listingType || "residential").toLowerCase();
+    const status      = mapStatus(listing.status || "active");
+  
+    let innerXml = "";
+    switch (listingType) {
+      case "residential":   innerXml = buildResidential(listing, agentId, status, now); break;
+      case "rental":        innerXml = buildRental(listing, agentId, status, now);      break;
+      case "commercial":    innerXml = buildCommercial(listing, agentId, status, now);  break;
+      case "land":          innerXml = buildLand(listing, agentId, status, now);        break;
+      case "rural":         innerXml = buildRural(listing, agentId, status, now);       break;
+      default:              innerXml = buildResidential(listing, agentId, status, now);
+    }
+  
+    return `<?xml version="1.0" encoding="UTF-8"?>
+  <!DOCTYPE propertyList SYSTEM "http://reaxml.realestate.com.au/propertyList.dtd">
+  <propertyList date="${now}">
+  ${innerXml}
+  </propertyList>`;
   }
   
   // ─────────────────────────────────────────────────────────────
@@ -171,10 +171,9 @@ function formatDate(date) {
   // ─────────────────────────────────────────────────────────────
   function buildResidential(listing, agentId, status, now) {
     const p    = listing.property || {};
-    const addr = p.address || {};
-    const feat = p.features || {};
+    const addr = p.address        || {};
+    const feat = p.features       || {};
   
-    // Sold listing — minimal fields only
     if (status === "sold") {
       return `  <residential modTime="${now}" status="sold">
       <agentID>${escapeXml(agentId)}</agentID>
@@ -186,7 +185,6 @@ function formatDate(date) {
     </residential>`;
     }
   
-    // Withdrawn listing
     if (status === "withdrawn") {
       return `  <residential modTime="${now}" status="withdrawn">
       <agentID>${escapeXml(agentId)}</agentID>
@@ -194,13 +192,12 @@ function formatDate(date) {
     </residential>`;
     }
   
-    // Current listing — full details
     return `  <residential modTime="${now}" status="current">
       <agentID>${escapeXml(agentId)}</agentID>
       <uniqueID>${escapeXml(listing._id.toString())}</uniqueID>
       <authority value="exclusive"/>
       <underOffer value="${listing.underOffer === "yes" ? "yes" : "no"}"/>
-      ${listing.property?.newConstruction ? "<newConstruction>1</newConstruction>" : ""}
+      ${p.newConstruction ? "<newConstruction>1</newConstruction>" : ""}
       ${buildListingAgent(listing.agent)}
       <price display="yes">${p.price || 0}</price>
       ${p.priceView ? `<priceView>${escapeXml(p.priceView)}</priceView>` : ""}
@@ -215,11 +212,7 @@ function formatDate(date) {
       <inspectionTimes>
         <inspection>${escapeXml(p.inspection.start)}</inspection>
       </inspectionTimes>` : ""}
-      ${listing.vendor?.name ? `
-      <vendorDetails>
-        <name>${escapeXml(listing.vendor.name)}</name>
-        ${listing.vendor.phone ? `<telephone type="mobile">${escapeXml(listing.vendor.phone)}</telephone>` : ""}
-      </vendorDetails>` : ""}
+      ${buildVendorDetails(listing.vendor)}
       ${buildImages(p.images, now)}
       ${buildFloorplans(p.floorplans, now)}
     </residential>`;
@@ -230,8 +223,8 @@ function formatDate(date) {
   // ─────────────────────────────────────────────────────────────
   function buildRental(listing, agentId, status, now) {
     const p    = listing.property || {};
-    const addr = p.address || {};
-    const feat = p.features || {};
+    const addr = p.address        || {};
+    const feat = p.features       || {};
   
     if (status === "leased" || status === "withdrawn") {
       return `  <rental modTime="${now}" status="${status}">
@@ -264,14 +257,13 @@ function formatDate(date) {
   // ─────────────────────────────────────────────────────────────
   function buildCommercial(listing, agentId, status, now) {
     const p    = listing.property || {};
-    const addr = p.address || {};
+    const addr = p.address        || {};
   
     if (status === "sold" || status === "withdrawn") {
       return `  <commercial modTime="${now}" status="${status}">
       <agentID>${escapeXml(agentId)}</agentID>
       <uniqueID>${escapeXml(listing._id.toString())}</uniqueID>
-      ${status === "sold" ? `
-      <soldDetails>
+      ${status === "sold" ? `<soldDetails>
         <price display="yes">${p.price || 0}</price>
         <date>${now}</date>
       </soldDetails>` : ""}
@@ -302,14 +294,13 @@ function formatDate(date) {
   // ─────────────────────────────────────────────────────────────
   function buildLand(listing, agentId, status, now) {
     const p    = listing.property || {};
-    const addr = p.address || {};
+    const addr = p.address        || {};
   
     if (status === "sold" || status === "withdrawn") {
       return `  <land modTime="${now}" status="${status}">
       <agentID>${escapeXml(agentId)}</agentID>
       <uniqueID>${escapeXml(listing._id.toString())}</uniqueID>
-      ${status === "sold" ? `
-      <soldDetails>
+      ${status === "sold" ? `<soldDetails>
         <price display="yes">${p.price || 0}</price>
         <date>${now}</date>
       </soldDetails>` : ""}
@@ -339,15 +330,14 @@ function formatDate(date) {
   // ─────────────────────────────────────────────────────────────
   function buildRural(listing, agentId, status, now) {
     const p    = listing.property || {};
-    const addr = p.address || {};
-    const feat = p.features || {};
+    const addr = p.address        || {};
+    const feat = p.features       || {};
   
     if (status === "sold" || status === "withdrawn") {
       return `  <rural modTime="${now}" status="${status}">
       <agentID>${escapeXml(agentId)}</agentID>
       <uniqueID>${escapeXml(listing._id.toString())}</uniqueID>
-      ${status === "sold" ? `
-      <soldDetails>
+      ${status === "sold" ? `<soldDetails>
         <price display="yes">${p.price || 0}</price>
         <date>${now}</date>
       </soldDetails>` : ""}
